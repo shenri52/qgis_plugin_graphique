@@ -28,9 +28,9 @@ class FakeGeometry:
         return self.bounds
 
     def intersects(self, other):
-        x, y, _x2, _y2 = other.bounds
         x1, y1, x2, y2 = self.bounds
-        return x1 <= x <= x2 and y1 <= y <= y2
+        ox1, oy1, ox2, oy2 = other.bounds
+        return not (x2 < ox1 or ox2 < x1 or y2 < oy1 or oy2 < y1)
 
     def intersection(self, other):
         x1 = max(self.bounds[0], other.bounds[0])
@@ -120,6 +120,31 @@ def test_polygon_source_uses_largest_intersection_area():
 
     assert not outside
     assert assigned[0]["__territoire__"] == "B"
+
+
+def test_polygon_boundary_touch_matches_intersects_predicate():
+    polygons = FakeLayer([
+        qgis_stubs.FakeFeature({"CODE": "A"}, FakeGeometry((0, 0, 5, 10)), 10),
+        qgis_stubs.FakeFeature({"CODE": "B"}, FakeGeometry((5, 0, 10, 10)), 20),
+    ], ["CODE"], geometry_type=2)
+    # Le polygone source touche A par une frontière seulement : aire d'intersection nulle.
+    source = FakeLayer([
+        qgis_stubs.FakeFeature({"VALUE": 8}, FakeGeometry((5, 2, 8, 8)), 99),
+    ], ["VALUE"], geometry_type=2)
+
+    assigned, outside = data.read_rows_by_polygon(source, polygons, "CODE", ["VALUE"])
+
+    assert not outside
+    assert assigned[0]["__territoire__"] == "B"
+
+    # Contact uniquement sur la frontière commune : intersects vrai, mesure nulle,
+    # départage déterministe par le plus petit FID.
+    source = FakeLayer([
+        qgis_stubs.FakeFeature({"VALUE": 8}, FakeGeometry((5, 2, 5, 8)), 100),
+    ], ["VALUE"], geometry_type=2)
+    assigned, outside = data.read_rows_by_polygon(source, polygons, "CODE", ["VALUE"])
+    assert not outside
+    assert assigned[0]["__territoire__"] == "A"
 
 
 def test_line_source_uses_largest_intersection_length_and_fid_tie_break():
