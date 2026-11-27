@@ -8,7 +8,7 @@ from . import core
 PALETTE = ("#4c78a8", "#f58518", "#54a24b", "#e45756", "#72b7b2",
            "#eeca3b", "#b279a2", "#ff9da6", "#9d755d", "#bab0ac")
 MAX_TICKS = 60
-PREVIEW_DPI = 100
+PREVIEW_DPI = 200
 MATPLOTLIB_FORMATS = {"png": "png", "jpg": "jpg", "svg": "svg", "pdf": "pdf", "tiff": "tiff"}
 
 
