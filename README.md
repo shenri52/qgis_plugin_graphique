@@ -18,7 +18,7 @@ Elle généralise un script de suivi du drainage (graphiques par EPCI et pour le
 - Filtre par **expression QGIS** et option « entités sélectionnées uniquement ».
 - **Aperçu** dans la fenêtre avant export.
 - **Export** dans le dossier de votre choix, en **PNG, JPEG, SVG, PDF ou TIFF**, avec résolution et taille réglables.
-- **Mode lot** : un graphique par valeur d'un champ (ex. un par EPCI), plus un graphique global optionnel, avec une liste de valeurs à ignorer.
+- **Mode lot** : un graphique par valeur d'un champ (ex. un par territoire), plus un graphique global optionnel, avec une liste de valeurs à ignorer.\n- **Rattachement spatial facultatif** : associe chaque entité à une couche polygonale quelconque à partir d'un point représentatif, sans créer ni modifier de champ dans la couche source. Les entités sans correspondance sont exclues du total territorial, peuvent produire un graphique `HORS_ZONE` et un CSV de contrôle.
 - **Nom des fichiers personnalisable** avec des balises : `{couche}` `{x}` `{y}` `{type}` `{agregation}` `{valeur}` `{xmin}` `{xmax}` `{duree}` `{date}` (AAAAMMJJ) `{aamm}` (ex. 2611). L'extension est ajoutée automatiquement ; les caractères dangereux (`/`, `\`, `..`) sont retirés ; deux noms identiques sont rendus uniques ; un fichier existant n'est écrasé qu'après confirmation.
 - Interface en français ou en anglais selon la langue de QGIS ; réglages mémorisés.
 
@@ -45,7 +45,7 @@ Publier une version : mettre à jour `version` et `changelog` dans `metadata.txt
 
 ### Historique des versions
 
-- **1.0.0** – Première version.
+- **1.1.0** – Rattachement spatial générique à une couche polygonale, graphique `HORS_ZONE` et export CSV de contrôle optionnel.\n- **1.0.0** – Première version.
 
 ## English
 
@@ -64,7 +64,7 @@ Publier une version : mettre à jour `version` et `changelog` dans `metadata.txt
 - **Customizable file names** with tags: `{couche}` (layer) `{x}` `{y}` `{type}` `{agregation}` `{valeur}` (batch value) `{xmin}` `{xmax}` `{duree}` (X range length) `{date}` (YYYYMMDD) `{aamm}` (e.g. 2611). The extension is added automatically, unsafe characters are removed, duplicate names are made unique, and existing files are only overwritten after confirmation.
 - Interface in French or English following the QGIS language; settings are remembered.
 
-The geoprocessing (spatial join, aggregation) and PDF atlas exports of the original script are not part of the plugin: prepare a layer that already holds the territory field.
+The plugin can now perform the spatial assignment itself; no pre-existing territory field is required. PDF atlas exports remain outside its scope.
 
 ### Installation
 
@@ -76,7 +76,7 @@ The plugin relies on **matplotlib**, bundled with QGIS on Windows and macOS. On 
 
 ### Version history
 
-- **1.0.0** – Initial release.
+- **1.1.0** – Generic spatial assignment to a polygon layer, `HORS_ZONE` chart and optional CSV audit export.\n- **1.0.0** – Initial release.
 
 ## License
 
