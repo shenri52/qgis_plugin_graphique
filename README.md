@@ -50,13 +50,14 @@ Publier une version : mettre à jour `version` et `changelog` dans `metadata.txt
 
 ### Historique des versions
 
-- **1.1.6** – Aperçu des graphiques rendu en 200 DPI pour une meilleure netteté, sans modifier la qualité ni les paramètres d'export.
-- **1.1.5** – Le rattachement spatial suit le prédicat `intersects` de QGIS : les contacts de frontière sont affectés si aucun recouvrement de surface/longueur positive n'existe.
-- **1.1.4** – Les bornes X restent appliquées dans chaque lot même si certaines valeurs X sont non numériques ; ces valeurs sont écartées de l'axe borné.
-- **1.1.3** – Export CSV HORS_ZONE en UTF-8 sans BOM et séparateur virgule ; actualisation automatique de l'aperçu ; rattachement des lignes et polygones par intersection maximale avec départage par FID.
+- **1.1.7** – Ajout d'un bouton pour réinitialiser tous les paramètres du plugin à leurs valeurs par défaut.
+- **1.1.6** – Aperçu des graphiques rendu en 200 DPI pour une meilleure netteté, sans modifier les paramètres d'export.
+- **1.1.5** – Le rattachement spatial suit le prédicat QGIS `intersects`, y compris les contacts de frontière lorsqu'aucun recouvrement de surface ou de longueur positif n'existe.
+- **1.1.4** – Les bornes X min/max sont appliquées à chaque lot même en présence de valeurs X non numériques ; ces valeurs sont exclues de l'axe numérique borné.
+- **1.1.3** – Export CSV HORS_ZONE en UTF-8 sans BOM et séparateur virgule ; actualisation de l'aperçu lors du changement de valeur ; rattachement des lignes et polygones par mesure d'intersection maximale avec départage par FID.
 - **1.1.2** – Traduction anglaise complète des nouveaux libellés et messages de détection des bornes X.
-- **1.1.1** – Détection des bornes X après filtre et sélection pour faciliter le calcul de `{duree}`.
-- **1.1.0** – Rattachement spatial générique à une couche polygonale, graphique `HORS_ZONE`, export CSV de contrôle, constructeur d'expression, couleurs par série et aperçu du nom de fichier. 
+- **1.1.1** – Détection des bornes X à partir des valeurs numériques après filtre et sélection pour faciliter le calcul de `{duree}`.
+- **1.1.0** – Rattachement spatial générique à une couche polygonale, graphique `HORS_ZONE`, export CSV de contrôle, constructeur d'expression, couleurs par série et aperçu du nom de fichier.
 - **1.0.0** – Première version.
 
 ## English
@@ -91,12 +92,14 @@ The plugin relies on **matplotlib**, bundled with QGIS on Windows and macOS. On 
 
 ### Version history
 
-- **1.1.5** – Spatial assignment follows QGIS `intersects`: boundary-touching features are assigned when no positive-area/length overlap exists.
-- **1.1.4** – X min/max bounds are applied independently in every batch, even when some X values are non-numeric; those values are excluded from the bounded axis.
-- **1.1.3** – HORS_ZONE CSV uses UTF-8 without BOM and comma delimiter; preview refreshes when the selected value changes; line and polygon assignment uses maximum intersection measure with FID tie-break.
-- **1.1.2** – Complete English translations for the X range detection controls and messages.
-- **1.1.1** – Detect X min/max from filtered and selected numeric values for duration tags.
-- **1.1.0** – Generic spatial assignment to a polygon layer, `HORS_ZONE` chart and optional CSV audit export. 
+- **1.1.7** – Added a button to reset all plugin settings to their default values.
+- **1.1.6** – Chart preview rendered at 200 DPI for improved sharpness; export settings remain unchanged.
+- **1.1.5** – Spatial assignment follows QGIS `intersects`, including boundary-only contacts when no positive-area or positive-length overlap exists.
+- **1.1.4** – X min/max bounds are applied to every batch even when some X values are non-numeric; those values are excluded from the bounded numeric axis.
+- **1.1.3** – HORS_ZONE CSV uses UTF-8 without BOM and a comma delimiter; preview refreshes when the selected value changes; line and polygon assignment use maximum intersection measure with FID tie-break.
+- **1.1.2** – Complete English translations for the new X range detection labels and messages.
+- **1.1.1** – Detect X min/max from numeric values after filtering and selection to support the `{duree}` tag.
+- **1.1.0** – Generic spatial assignment to a polygon layer, `HORS_ZONE` chart, audit CSV export, expression builder, per-series colours and filename preview.
 - **1.0.0** – Initial release.
 
 ## License
