@@ -8,6 +8,9 @@ EN = {
     "Aperçu": "Preview",
     "Exporter": "Export",
     "Fermer": "Close",
+    "Réinitialiser les paramètres": "Reset settings",
+    "Tous les paramètres seront remis à leurs valeurs par défaut. Continuer ?":
+        "All settings will be restored to their defaults. Continue?",
     "Données": "Data",
     "Graphique": "Chart",
     "Export": "Export",
