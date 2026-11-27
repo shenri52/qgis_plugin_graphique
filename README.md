@@ -45,7 +45,8 @@ Publier une version : mettre à jour `version` et `changelog` dans `metadata.txt
 
 ### Historique des versions
 
-- **1.1.0** – Rattachement spatial générique à une couche polygonale, graphique `HORS_ZONE` et export CSV de contrôle optionnel.\n- **1.0.0** – Première version.
+- **1.1.0** – Rattachement spatial générique à une couche polygonale, graphique `HORS_ZONE` et export CSV de contrôle optionnel. 
+- **1.0.0** – Première version.
 
 ## English
 
@@ -76,7 +77,8 @@ The plugin relies on **matplotlib**, bundled with QGIS on Windows and macOS. On 
 
 ### Version history
 
-- **1.1.0** – Generic spatial assignment to a polygon layer, `HORS_ZONE` chart and optional CSV audit export.\n- **1.0.0** – Initial release.
+- **1.1.0** – Generic spatial assignment to a polygon layer, `HORS_ZONE` chart and optional CSV audit export. 
+- **1.0.0** – Initial release.
 
 ## License
 
