@@ -20,6 +20,8 @@ Dans l'onglet **Données** :
 2. Si nécessaire, cochez **Entités sélectionnées uniquement** pour limiter le graphique à la sélection courante.
 3. Vous pouvez saisir une **expression QGIS** dans le champ Filtre ou ouvrir le **Constructeur…** pour la composer. Le filtre est facultatif.
 
+![Onglet Données : choix de la couche, filtre, champs X et Y, mode lot et rattachement spatial](images/01-onglet-donnees.png)
+
 Exemple de filtre :
 
 ```qgis
@@ -49,6 +51,8 @@ Dans l'onglet **Graphique**, choisissez le type adapté :
 - **Nuage de points** : comparer deux variables numériques.
 - **Camembert** : représenter des parts d'un total.
 - **Histogramme de distribution** : visualiser la distribution d'un champ Y en classes.
+
+![Onglet Graphique : type, titre, libellés, bornes des axes, couleurs et options d'affichage](images/02-onglet-graphique.png)
 
 Vous pouvez ensuite régler le titre, les libellés des axes, la couleur principale, la légende, la grille, l'affichage des valeurs, la rotation des étiquettes X et les graduations.
 
@@ -106,6 +110,8 @@ Dans l'onglet **Export** :
 4. Choisissez le format : PNG, JPEG, SVG, PDF ou TIFF.
 5. Réglez la résolution en dpi ainsi que la largeur et la hauteur en pouces.
 
+![Onglet Export : dossier, modèle et aperçu du nom, format, résolution et dimensions](images/03-onglet-export.png)
+
 ### Balises de nommage
 
 Le modèle peut contenir les balises suivantes, remplacées automatiquement :
@@ -125,7 +131,9 @@ Le modèle peut contenir les balises suivantes, remplacées automatiquement :
 
 L'extension correspondant au format choisi est ajoutée automatiquement. Les caractères dangereux pour un nom de fichier sont supprimés et les noms en doublon sont rendus uniques. Si un fichier existe déjà, le plugin demande confirmation avant de l'écraser.
 
-Cliquez sur **Aperçu** pour vérifier le graphique, puis sur **Exporter** pour enregistrer les fichiers. En mode lot, le plugin génère les graphiques correspondant aux valeurs retenues.
+Cliquez sur **Aperçu** pour afficher le graphique dans la fenêtre. L'exemple ci-dessous montre un graphique obtenu avec un champ date en X et un comptage des entités. Cliquez ensuite sur **Exporter** pour enregistrer les fichiers. En mode lot, le plugin génère les graphiques correspondant aux valeurs retenues.
+
+![Exemple d'aperçu d'un graphique dans Graphique Couche](images/04-apercu-graphique.png)
 
 ## 6. Conseils et résolution des problèmes
 
