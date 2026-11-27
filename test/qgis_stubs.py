@@ -68,6 +68,17 @@ class FakeRequest:
         self.expression = text
 
 
+class FakeSpatialIndex:
+    def __init__(self, *_args, **_kwargs):
+        self.features = []
+
+    def addFeature(self, feature):  # noqa: N802
+        self.features.append(feature)
+
+    def intersects(self, _rectangle):
+        return []
+
+
 class FakeExpression:
     def __init__(self, text):
         self.text = text
@@ -159,6 +170,7 @@ def install(qt="PyQt6"):
     core.QgsProject = FakeProject
     core.QgsVectorLayer = QgsVectorLayer
     core.QgsFeatureRequest = FakeRequest
+    core.QgsSpatialIndex = FakeSpatialIndex
     core.QgsExpression = FakeExpression
     core.NULL = NULL
     sys.modules["qgis.core"] = core
