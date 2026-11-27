@@ -16,5 +16,5 @@ tags=chart, graph, plot, histogram, export, statistics, matplotlib
 icon=icon.png
 experimental=False
 deprecated=False
-changelog=1.1.0 – Generic spatial assignment to polygon layers, HORS_ZONE chart and optional CSV audit export; 1.0.0 – Initial release.
+changelog=1.1.0 – Generic spatial assignment to polygon layers, HORS_ZONE chart, CSV audit export, expression builder, per-series colours and filename preview; 1.0.0 – Initial release.
 changelog[fr]=1.1.0 – Rattachement spatial générique aux couches polygonales, graphique HORS_ZONE, export CSV, constructeur d'expression, couleurs par série et aperçu du nom ; 1.0.0 – Première version.
