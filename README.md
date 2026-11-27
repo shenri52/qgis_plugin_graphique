@@ -22,20 +22,6 @@ Elle généralise un script de suivi du drainage (graphiques par EPCI et pour le
 - **Nom des fichiers personnalisable** avec des balises : `{couche}` `{x}` `{y}` `{type}` `{agregation}` `{valeur}` `{xmin}` `{xmax}` `{duree}` `{date}` (AAAAMMJJ) `{aamm}` (ex. 2611). L'extension est ajoutée automatiquement ; les caractères dangereux (`/`, `\`, `..`) sont retirés ; deux noms identiques sont rendus uniques ; un fichier existant n'est écrasé qu'après confirmation.
 - Interface en français ou en anglais selon la langue de QGIS ; réglages mémorisés.
 
-### Reproduire le script « Drainage »
-
-Le script d'origine fait aussi des géotraitements (jointure spatiale, agrégation) et des exports d'atlas PDF : ces parties ne sont **pas** dans le plugin. Préparez d'abord une couche avec le champ de territoire (par exemple en joignant `SIREN_EPCI` par localisation), puis :
-
-| Réglage | Valeur |
-| --- | --- |
-| Champ X | `DATE` |
-| Champ Y / calcul | `S_DRAINEE_ha` / Somme (ou « Nombre d'entités ») |
-| Échelles X min / max | `2021` / `2025` (5 ans) ou `2016` / `2025` (10 ans) |
-| Lot | champ `SIREN_EPCI`, graphique global activé, libellé `DEPARTEMENT` |
-| Nom des fichiers | `{y}_{duree}Ans_{valeur}` |
-
-Avec le comptage, les fichiers s'appellent `NB_5Ans_<EPCI>.png` et `NB_5Ans_DEPARTEMENT.png`. Pour obtenir `SURF_HA_5Ans_<EPCI>.png`, écrivez `SURF_HA_{duree}Ans_{valeur}` dans le nom.
-
 ### Installation
 
 1. Téléchargez `qgis_plugin_graphique.zip` depuis la page [Releases](https://github.com/shenri52/qgis-plugin-graphique/releases).
