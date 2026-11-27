@@ -9,6 +9,8 @@
 
 Elle généralise un script de suivi du drainage (graphiques par EPCI et pour le département) : le script n'est plus lié à une couche ni à des noms de champs.
 
+Un **[guide utilisateur pas à pas](GUIDE_UTILISATEUR.md)** est disponible pour accompagner la création des graphiques, le rattachement spatial et les exports.
+
 ### Fonctionnalités
 
 - Choix de la **couche**, des **champs X** (un ou plusieurs) et du **champ Y**. Le premier champ X coché de la liste est l'axe ; les suivants forment les séries (barres groupées/empilées, plusieurs courbes). Glissez les champs pour changer l'ordre.
