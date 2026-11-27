@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Fenêtre principale de Graphique Couche : réglages à gauche, aperçu à droite."""
+import csv
 import os
 from datetime import datetime
 
@@ -142,7 +143,24 @@ class GraphDialog(QDialog):
         batch_form.addRow(tr("Valeurs à ignorer (séparées par ;)"), self.ignore_edit)
         layout.addWidget(self.batch_group)
 
+        self.spatial_group = QGroupBox(tr("Rattachement spatial à un territoire"))
+        spatial_form = QFormLayout(self.spatial_group)
+        self.spatial_check = QCheckBox(tr("Associer les entités à une couche polygonale"))
+        self.polygon_combo = QComboBox()
+        self.polygon_field_combo = QComboBox()
+        self.hors_zone_check = QCheckBox(tr("Créer un graphique HORS_ZONE"))
+        self.hors_zone_check.setChecked(True)
+        self.csv_check = QCheckBox(tr("Exporter les entités HORS_ZONE en CSV"))
+        spatial_form.addRow(self.spatial_check)
+        spatial_form.addRow(tr("Couche polygonale"), self.polygon_combo)
+        spatial_form.addRow(tr("Champ identifiant / libellé"), self.polygon_field_combo)
+        spatial_form.addRow(self.hors_zone_check)
+        spatial_form.addRow(self.csv_check)
+        layout.addWidget(self.spatial_group)
+
         self.layer_combo.currentIndexChanged.connect(self._populate_fields)
+        self.polygon_combo.currentIndexChanged.connect(self._populate_polygon_fields)
+        self.spatial_check.toggled.connect(self._update_visibility)
         self.refresh_button.clicked.connect(self.refresh_layers)
         self.batch_combo.currentIndexChanged.connect(self._update_visibility)
         self.agg_combo.currentIndexChanged.connect(self._update_visibility)
@@ -278,11 +296,16 @@ class GraphDialog(QDialog):
         chart_type = self.type_combo.currentData()
         self.bins_spin.setVisible(chart_type == "hist")
         self.bins_label.setVisible(chart_type == "hist")
-        batch_on = bool(self.batch_combo.currentData())
+        spatial_on = self.spatial_check.isChecked()
+        batch_on = bool(self.batch_combo.currentData()) and not spatial_on
+        self.batch_combo.setEnabled(not spatial_on)
         for widget in (self.include_global, self.global_label, self.ignore_edit):
             widget.setEnabled(batch_on)
         self.preview_value.setVisible(batch_on)
         self.preview_value_label.setVisible(batch_on)
+        for widget in (self.polygon_combo, self.polygon_field_combo,
+                       self.hors_zone_check, self.csv_check):
+            widget.setEnabled(spatial_on)
 
     def _apply_color_style(self):
         self.color_button.setStyleSheet(f"background-color: {self._color};")
@@ -311,6 +334,34 @@ class GraphDialog(QDialog):
         self.layer_combo.setCurrentIndex(index if index >= 0 else 0)
         self.layer_combo.blockSignals(False)
         self._populate_fields()
+        self._populate_spatial_layers()
+
+    def _populate_spatial_layers(self, *_args):
+        previous = self.polygon_combo.currentData()
+        self.polygon_combo.blockSignals(True)
+        self.polygon_combo.clear()
+        for layer in QgsProject.instance().mapLayers().values():
+            if isinstance(layer, QgsVectorLayer) and layer.geometryType() == 2:
+                self.polygon_combo.addItem(layer.name(), layer.id())
+        index = self.polygon_combo.findData(previous) if previous else -1
+        self.polygon_combo.setCurrentIndex(index if index >= 0 else 0)
+        self.polygon_combo.blockSignals(False)
+        self._populate_polygon_fields()
+
+    def _polygon_layer(self):
+        layer_id = self.polygon_combo.currentData()
+        layer = QgsProject.instance().mapLayer(layer_id) if layer_id else None
+        return layer if isinstance(layer, QgsVectorLayer) and layer.geometryType() == 2 else None
+
+    def _populate_polygon_fields(self, *_args):
+        layer = self._polygon_layer()
+        previous = self.polygon_field_combo.currentData()
+        self.polygon_field_combo.clear()
+        if layer is not None:
+            for name in data.field_names(layer):
+                self.polygon_field_combo.addItem(name, name)
+        index = self.polygon_field_combo.findData(previous) if previous else -1
+        self.polygon_field_combo.setCurrentIndex(index if index >= 0 else 0)
 
     def _current_layer(self):
         layer_id = self.layer_combo.currentData()
@@ -413,15 +464,31 @@ class GraphDialog(QDialog):
             "folder": folder, "pattern": pattern, "fmt": self.format_combo.currentData(),
             "selected_only": self.selected_only.isChecked(),
             "expression": self.filter_edit.text().strip(),
+            "spatial": spatial, "polygon_layer": polygon_layer, "polygon_field": polygon_field,
+            "hors_zone_chart": self.hors_zone_check.isChecked(),
+            "hors_zone_csv": self.csv_check.isChecked(),
         }
 
     def _plan(self, job):
-        """Lit la couche et retourne [(libellé, ChartData ou None, erreur)]."""
+        """Lit la couche et prépare les graphiques territoriaux."""
         fields = list(job["x_fields"]) + [job["y_field"], job["batch"]]
-        rows = data.read_rows(job["layer"], fields, job["selected_only"], job["expression"],
-                              cancelled=lambda: self._cancel)
-        groups = core.split_by_value(rows, job["batch"], job["include_global"],
-                                     job["global_label"], job["ignore"])
+        if job["spatial"]:
+            if job["hors_zone_csv"]:
+                fields = data.field_names(job["layer"])
+            rows, outside = data.read_rows_by_polygon(
+                job["layer"], job["polygon_layer"], job["polygon_field"], fields,
+                job["selected_only"], job["expression"], cancelled=lambda: self._cancel)
+            self._last_unmatched = outside
+            groups = core.split_by_value(rows, "__territoire__", job["include_global"],
+                                         job["global_label"], job["ignore"])
+            if job["hors_zone_chart"] and outside:
+                groups.append(("HORS_ZONE", outside))
+        else:
+            rows = data.read_rows(job["layer"], fields, job["selected_only"], job["expression"],
+                                  cancelled=lambda: self._cancel)
+            self._last_unmatched = []
+            groups = core.split_by_value(rows, job["batch"], job["include_global"],
+                                         job["global_label"], job["ignore"])
         spec = job["spec"]
         plan = []
         for label, subset in groups:
@@ -548,7 +615,7 @@ class GraphDialog(QDialog):
 
         items = [(label, chart) for label, chart, _error in plan if chart is not None]
         skipped = [label or tr("(global)") for label, chart, _error in plan if chart is None]
-        if not items:
+        if not items and not (job["spatial"] and job["hors_zone_csv"] and self._last_unmatched):
             self._warn(tr("Aucune donnée à tracer : %s") % ", ".join(e for _l, c, e in plan if c is None))
             return
         spec = job["spec"]
@@ -556,7 +623,13 @@ class GraphDialog(QDialog):
             core.build_filename(job["pattern"], self._file_values(job, label, spec), job["fmt"])
             for label, _chart in items])
         targets = [os.path.join(folder, name) for name in names]
+        csv_target = None
+        if job["spatial"] and job["hors_zone_csv"] and self._last_unmatched:
+            csv_target = os.path.join(
+                folder, core.build_filename(job["pattern"], self._file_values(job, "HORS_ZONE", spec), "csv"))
         existing = [t for t in targets if os.path.exists(t)]
+        if csv_target and os.path.exists(csv_target):
+            existing.append(csv_target)
         if existing:
             answer = QMessageBox.question(
                 self, tr("Attention"), tr("%d fichier(s) existent déjà. Les écraser ?") % len(existing),
@@ -593,7 +666,23 @@ class GraphDialog(QDialog):
                 csv_done = True
             except OSError as error:
                 self._warn(tr("Erreur d'écriture : %s") % error)
+        csv_done = False
+        if csv_target:
+            try:
+                csv_fields = list(dict.fromkeys(
+                    key for row in self._last_unmatched for key in row.keys()
+                    if key != "__territoire__"))
+                with open(csv_target, "w", newline="", encoding="utf-8-sig") as stream:
+                    writer = csv.DictWriter(stream, fieldnames=csv_fields, extrasaction="ignore",
+                                            delimiter=";")
+                    writer.writeheader()
+                    writer.writerows(self._last_unmatched)
+                csv_done = True
+            except OSError as error:
+                self._warn(tr("Erreur d'écriture : %s") % error)
         message = tr("%d graphique(s) exporté(s) dans :\n%s") % (done, folder)
+        if csv_done:
+            message += "\nCSV HORS_ZONE : " + os.path.basename(csv_target)
         if csv_done:
             message += "\nCSV HORS_ZONE : " + os.path.basename(csv_target)
         if skipped:
@@ -615,6 +704,8 @@ class GraphDialog(QDialog):
             "values": self.values_check.isChecked(), "spines": self.spines_check.isChecked(),
             "inty": self.intY_check.isChecked(), "allticks": self.allticks_check.isChecked(),
             "global_label": self.global_label.text(), "include_global": self.include_global.isChecked(),
+            "spatial": self.spatial_check.isChecked(), "hors_zone_chart": self.hors_zone_check.isChecked(),
+            "hors_zone_csv": self.csv_check.isChecked(),
             "spatial": self.spatial_check.isChecked(), "hors_zone_chart": self.hors_zone_check.isChecked(),
             "hors_zone_csv": self.csv_check.isChecked(),
         }
@@ -653,6 +744,10 @@ class GraphDialog(QDialog):
         self.allticks_check.setChecked(get("allticks", True, bool))
         self.global_label.setText(get("global_label", "TOTAL"))
         self.include_global.setChecked(get("include_global", True, bool))
+        self.spatial_check.setChecked(get("spatial", False, bool))
+        self.hors_zone_check.setChecked(get("hors_zone_chart", True, bool))
+        self.csv_check.setChecked(get("hors_zone_csv", False, bool))
+        self._update_visibility()
         self.spatial_check.setChecked(get("spatial", False, bool))
         self.hors_zone_check.setChecked(get("hors_zone_chart", True, bool))
         self.csv_check.setChecked(get("hors_zone_csv", False, bool))
