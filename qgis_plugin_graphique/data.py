@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Lecture des entités et rattachement spatial à une couche polygonale."""
-from qgis.core import NULL, QgsExpression, QgsFeatureRequest, QgsSpatialIndex
+from qgis.core import (NULL, QgsCoordinateTransform, QgsExpression, QgsFeatureRequest,
+                       QgsProject, QgsSpatialIndex)
 
 from . import core
 
@@ -66,6 +67,10 @@ def read_rows_by_polygon(source_layer, polygon_layer, label_field, fields,
     if error:
         raise core.ChartError(error)
 
+    transform = None
+    if source_layer.crs() != polygon_layer.crs():
+        transform = QgsCoordinateTransform(source_layer.crs(), polygon_layer.crs(), QgsProject.instance())
+
     polygon_features = {}
     index = QgsSpatialIndex()
     for polygon in polygon_layer.getFeatures():
@@ -95,6 +100,8 @@ def read_rows_by_polygon(source_layer, polygon_layer, label_field, fields,
                 representative = geom.pointOnSurface()
                 if representative is None or representative.isEmpty():
                     representative = geom.centroid()
+                if transform is not None:
+                    representative.transform(transform)
                 candidate_ids = sorted(index.intersects(representative.boundingBox()))
                 for fid in candidate_ids:
                     polygon = polygon_features.get(fid)
@@ -104,6 +111,7 @@ def read_rows_by_polygon(source_layer, polygon_layer, label_field, fields,
                         break
             except Exception:
                 match_value = None
+                reason = "Erreur de géométrie ou de reprojection"
         row["__fid__"] = feature.id()
         if not matched:
             row["__motif__"] = reason
