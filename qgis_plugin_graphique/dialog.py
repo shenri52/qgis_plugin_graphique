@@ -53,6 +53,7 @@ class GraphDialog(QDialog):
         self.setWindowTitle(tr("Graphique Couche"))
         self.resize(1100, 640)
         self._color = core.DEFAULT_COLOR
+        self._series_colors = {}
         self._pixmap = None
         self._running = False
         self._cancel = False
@@ -216,6 +217,12 @@ class GraphDialog(QDialog):
         form2.addRow(self.bins_label, self.bins_spin)
         form2.addRow(tr("Rotation des étiquettes X"), self.rotation_spin)
         layout.addLayout(form2)
+        self.series_color_list = QListWidget()
+        self.series_color_list.setMaximumHeight(120)
+        self.series_color_list.setToolTip(tr("Double-cliquez sur une série pour choisir sa couleur."))
+        self.series_color_list.itemDoubleClicked.connect(self._choose_series_color)
+        layout.addWidget(QLabel(tr("Couleurs des séries (après aperçu)")))
+        layout.addWidget(self.series_color_list)
 
         self.legend_check = QCheckBox(tr("Légende"))
         self.legend_check.setChecked(True)
@@ -286,10 +293,13 @@ class GraphDialog(QDialog):
 
     def _update_filename_preview(self, *_args):
         layer = self._current_layer()
+        try:
+            xmin = core.parse_optional_float(self.xmin_edit.text())
+            xmax = core.parse_optional_float(self.xmax_edit.text())
+        except core.ChartError:
+            xmin = xmax = None
         spec = core.ChartSpec(
-            chart_type=self.type_combo.currentData() or "bar",
-            xmin=core.parse_optional_float(self.xmin_edit.text()) if self.xmin_edit.text().strip() else None,
-            xmax=core.parse_optional_float(self.xmax_edit.text()) if self.xmax_edit.text().strip() else None)
+            chart_type=self.type_combo.currentData() or "bar", xmin=xmin, xmax=xmax)
         values = {
             "couche": layer.name() if layer else "couche",
             "x": "_".join(self._checked_x()) or "X",
@@ -349,6 +359,14 @@ class GraphDialog(QDialog):
         if color.isValid():
             self._color = core.valid_color(color.name())
             self._apply_color_style()
+
+    def _choose_series_color(self, item):
+        name = item.data(Qt.ItemDataRole.UserRole)
+        current = self._series_colors.get(name, item.background().color().name())
+        color = QColorDialog.getColor(QColor(current), self)
+        if color.isValid():
+            self._series_colors[name] = core.valid_color(color.name())
+            item.setBackground(QColor(color.name())
 
     def _request_cancel(self):
         self._cancel = True
@@ -493,7 +511,7 @@ class GraphDialog(QDialog):
             chart_type=chart_type, title=self.title_edit.text().strip(),
             xlabel=self.xlabel_edit.text().strip(), ylabel=self.ylabel_edit.text().strip(),
             xmin=scales[0], xmax=scales[1], ymin=scales[2], ymax=scales[3],
-            color=core.valid_color(self._color), width=self.width_spin.value(),
+            color=core.valid_color(self._color), series_colors=dict(self._series_colors), width=self.width_spin.value(),
             height=self.height_spin.value(), dpi=self.dpi_spin.value(),
             legend=self.legend_check.isChecked(), grid=self.grid_check.isChecked(),
             show_values=self.values_check.isChecked(), hide_spines=self.spines_check.isChecked(),
@@ -562,6 +580,20 @@ class GraphDialog(QDialog):
         if not plan:
             self._warn(tr("Aucune donnée à tracer : %s") % "")
             return
+        series_names = []
+        for _label, chart_data, _error in plan:
+            if chart_data is not None:
+                for series in chart_data.series:
+                    if series.name not in series_names:
+                        series_names.append(series.name)
+        self.series_color_list.clear()
+        for index, name in enumerate(series_names):
+            item = QListWidgetItem(name)
+            item.setData(Qt.ItemDataRole.UserRole, name)
+            color = self._series_colors.get(name, render.PALETTE[index % len(render.PALETTE)])
+            item.setBackground(QColor(color))
+            self.series_color_list.addItem(item)
+        job["spec"].series_colors = dict(self._series_colors)
         wanted = self.preview_value.currentText()
         self.preview_value.blockSignals(True)
         self.preview_value.clear()
