@@ -68,6 +68,11 @@ class FakeRequest:
         self.expression = text
 
 
+class FakeCoordinateTransform:
+    def __init__(self, *_args, **_kwargs):
+        pass
+
+
 class FakeSpatialIndex:
     def __init__(self, *_args, **_kwargs):
         self.features = []
@@ -171,6 +176,7 @@ def install(qt="PyQt6"):
     core.QgsVectorLayer = QgsVectorLayer
     core.QgsFeatureRequest = FakeRequest
     core.QgsSpatialIndex = FakeSpatialIndex
+    core.QgsCoordinateTransform = FakeCoordinateTransform
     core.QgsExpression = FakeExpression
     core.NULL = NULL
     sys.modules["qgis.core"] = core
