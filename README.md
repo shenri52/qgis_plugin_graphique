@@ -48,6 +48,7 @@ Publier une version : mettre à jour `version` et `changelog` dans `metadata.txt
 
 ### Historique des versions
 
+- **1.1.6** – Aperçu des graphiques rendu en 200 DPI pour une meilleure netteté, sans modifier la qualité ni les paramètres d'export.
 - **1.1.5** – Le rattachement spatial suit le prédicat `intersects` de QGIS : les contacts de frontière sont affectés si aucun recouvrement de surface/longueur positive n'existe.
 - **1.1.4** – Les bornes X restent appliquées dans chaque lot même si certaines valeurs X sont non numériques ; ces valeurs sont écartées de l'axe borné.
 - **1.1.3** – Export CSV HORS_ZONE en UTF-8 sans BOM et séparateur virgule ; actualisation automatique de l'aperçu ; rattachement des lignes et polygones par intersection maximale avec départage par FID.
