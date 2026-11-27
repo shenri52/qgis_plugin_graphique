@@ -179,3 +179,9 @@ def test_duration():
     assert core.duration(2021, 2025) == "5"
     assert core.duration(2016, 2025) == "10"
     assert core.duration(None, 2025) == "" and core.duration(2.5, 3) == "" and core.duration(5, 1) == ""
+
+
+def test_chart_spec_supports_per_series_colors():
+    spec = core.ChartSpec(series_colors={"A": "#112233", "B": "#445566"})
+    assert spec.series_colors["A"] == "#112233"
+    assert spec.series_colors["B"] == "#445566"
