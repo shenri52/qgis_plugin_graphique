@@ -240,6 +240,11 @@ class GraphDialog(QDialog):
             layout.addWidget(box)
         layout.addStretch(1)
         self.type_combo.currentIndexChanged.connect(self._update_visibility)
+        self.type_combo.currentIndexChanged.connect(self._update_filename_preview)
+        self.y_combo.currentIndexChanged.connect(self._update_filename_preview)
+        self.x_list.itemChanged.connect(self._update_filename_preview)
+        for edit in (self.xmin_edit, self.xmax_edit):
+            edit.textChanged.connect(self._update_filename_preview)
         return page
 
     def _build_export_tab(self):
