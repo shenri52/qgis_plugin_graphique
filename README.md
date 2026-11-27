@@ -48,6 +48,7 @@ Publier une version : mettre à jour `version` et `changelog` dans `metadata.txt
 
 ### Historique des versions
 
+- **1.1.4** – Les bornes X restent appliquées dans chaque lot même si certaines valeurs X sont non numériques ; ces valeurs sont écartées de l'axe borné.
 - **1.1.3** – Export CSV HORS_ZONE en UTF-8 sans BOM et séparateur virgule ; actualisation automatique de l'aperçu ; rattachement des lignes et polygones par intersection maximale avec départage par FID.
 - **1.1.2** – Traduction anglaise complète des nouveaux libellés et messages de détection des bornes X.
 - **1.1.1** – Détection des bornes X après filtre et sélection pour faciliter le calcul de `{duree}`.
@@ -86,6 +87,7 @@ The plugin relies on **matplotlib**, bundled with QGIS on Windows and macOS. On 
 
 ### Version history
 
+- **1.1.4** – X min/max bounds are applied independently in every batch, even when some X values are non-numeric; those values are excluded from the bounded axis.
 - **1.1.3** – HORS_ZONE CSV uses UTF-8 without BOM and comma delimiter; preview refreshes when the selected value changes; line and polygon assignment uses maximum intersection measure with FID tie-break.
 - **1.1.2** – Complete English translations for the X range detection controls and messages.
 - **1.1.1** – Detect X min/max from filtered and selected numeric values for duration tags.
