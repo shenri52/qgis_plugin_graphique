@@ -196,6 +196,10 @@ class GraphDialog(QDialog):
             edit.setPlaceholderText("auto")
         scale_form.addRow(tr("X min"), self.xmin_edit)
         scale_form.addRow(tr("X max"), self.xmax_edit)
+        self.detect_x_button = QPushButton(tr("Détecter les bornes X"))
+        self.detect_x_button.setToolTip(tr("Calcule les bornes à partir des valeurs X réellement retenues après le filtre."))
+        self.detect_x_button.clicked.connect(self._detect_x_range)
+        scale_form.addRow(self.detect_x_button)
         scale_form.addRow(tr("Y min"), self.ymin_edit)
         scale_form.addRow(tr("Y max"), self.ymax_edit)
         hint = QLabel(tr("Pour un X numérique, les données hors de la plage X sont ignorées."))
@@ -296,6 +300,30 @@ class GraphDialog(QDialog):
         layout.addWidget(help_label)
         layout.addStretch(1)
         return page
+
+    def _detect_x_range(self):
+        """Renseigne X min/max depuis les valeurs numériques après filtre et sélection."""
+        layer = self._current_layer()
+        x_fields = self._checked_x()
+        if layer is None or not x_fields:
+            self._warn(tr("Choisissez une couche et cochez au moins un champ X."))
+            return
+        axis = x_fields[0]
+        try:
+            rows = data.read_rows(
+                layer, [axis], self.selected_only.isChecked(), self.filter_edit.text(),
+                cancelled=lambda: self._cancel)
+        except core.ChartError as error:
+            self._warn(tr("Impossible de détecter les bornes X : %s") % error)
+            return
+        values = [core.to_number(row.get(axis)) for row in rows]
+        values = [value for value in values if value is not None]
+        if not values:
+            self._warn(tr("Aucune valeur X numérique disponible après application du filtre."))
+            return
+        self.xmin_edit.setText(core.format_number(min(values)))
+        self.xmax_edit.setText(core.format_number(max(values)))
+        self._update_filename_preview()
 
     def _update_filename_preview(self, *_args):
         layer = self._current_layer()
