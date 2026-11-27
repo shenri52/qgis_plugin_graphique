@@ -29,10 +29,12 @@ def _new_figure(spec, dpi):
     return figure
 
 
-def _colors(spec, count):
-    if count <= 1:
-        return [core.valid_color(spec.color)]
-    return [PALETTE[i % len(PALETTE)] for i in range(count)]
+def _colors(spec, series_names):
+    if len(series_names) <= 1:
+        return [core.valid_color(spec.series_colors.get(series_names[0], spec.color)
+                                 if series_names else spec.color)]
+    return [core.valid_color(spec.series_colors.get(name, PALETTE[i % len(PALETTE)]))
+            for i, name in enumerate(series_names)]
 
 
 def _positions(data):
@@ -66,7 +68,7 @@ def _draw_bars(ax, data, spec, horizontal, stacked):
     positions = _positions(data)
     gap = _gap(positions)
     count = len(data.series)
-    colors = _colors(spec, count)
+    colors = _colors(spec, [series.name for series in data.series])
     group_width = 0.8 * gap
     bar_width = group_width if stacked or count == 1 else group_width / count
     bottoms = {key: 0.0 for key in data.categories}
@@ -94,7 +96,7 @@ def _draw_bars(ax, data, spec, horizontal, stacked):
 
 def _draw_lines(ax, data, spec, area):
     positions = _positions(data)
-    colors = _colors(spec, len(data.series))
+    colors = _colors(spec, [series.name for series in data.series])
     for index, series in enumerate(data.series):
         points = sorted(((positions[k], v) for k, v in series.points), key=lambda p: p[0])
         xs = [p[0] for p in points]
