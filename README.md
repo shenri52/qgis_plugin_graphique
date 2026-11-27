@@ -81,8 +81,3 @@ The plugin relies on **matplotlib**, bundled with QGIS on Windows and macOS. On 
 ## License
 
 GPL-2.0. See [LICENSE](LICENSE).
-
-## Project links
-
-- Source code: <https://github.com/shenri52/qgis-plugin-graphique>
-- Issue tracker: <https://github.com/shenri52/qgis-plugin-graphique/issues>
