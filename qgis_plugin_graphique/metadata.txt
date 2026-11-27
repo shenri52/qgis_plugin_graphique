@@ -16,5 +16,21 @@ tags=chart, graph, plot, histogram, export, statistics, matplotlib
 icon=icon.png
 experimental=False
 deprecated=False
-changelog=1.1.7 – Add a reset button to restore all plugin settings to their defaults. 1.1.6 – Preview rendered at 200 DPI for improved sharpness; export settings remain unchanged. 1.1.5 – Spatial assignment follows QGIS intersects, including boundary-only contacts when no positive overlap exists; 1.1.4 – Apply X min/max bounds to every batch despite non-numeric X values; exclude non-numeric rows from a bounded numeric axis. ; 1.1.3 – HORS_ZONE CSV uses UTF-8 without BOM and comma delimiter; preview refreshes on selection change; polygon/line assignment uses maximum intersection measure with FID tie-break; 1.1.2 – Complete English translations for X range detection controls and messages; 1.1.1 – Detect X min/max from filtered and selected numeric values for duration tags; 1.1.0 – Generic spatial assignment to polygon layers, HORS_ZONE chart, CSV audit export, expression builder, per-series colours and filename preview; 1.0.0 – Initial release.
-changelog[fr]=1.1.7 – Ajout d'un bouton pour réinitialiser tous les paramètres du plugin à leurs valeurs par défaut ; 1.1.6 – Aperçu rendu en 200 DPI pour une meilleure netteté, sans modifier les paramètres d'export ; 1.1.5 – Le rattachement spatial suit le prédicat QGIS intersects, y compris les contacts de frontière lorsqu'aucun recouvrement positif n'existe ; 1.1.4 – Appliquer les bornes X min/max à chaque lot même en présence de valeurs X non numériques ; exclure ces lignes de l'axe numérique borné. ; 1.1.3 – Export CSV HORS_ZONE en UTF-8 sans BOM et séparateur virgule ; actualisation automatique de l'aperçu selon la valeur sélectionnée ; rattachement des polygones et lignes par intersection maximale avec départage par FID ; 1.1.2 – Traduction anglaise complète des libellés et messages de détection des bornes X ; 1.1.1 – Détection des bornes X à partir des valeurs numériques après filtre et sélection pour le calcul de la durée ; 1.1.0 – Rattachement spatial générique aux couches polygonales, graphique HORS_ZONE, export CSV, constructeur d'expression, couleurs par série et aperçu du nom ; 1.0.0 – Première version.
+changelog=1.1.7 – Add a reset button to restore all plugin settings to their defaults.
+    1.1.6 – Preview rendered at 200 DPI for improved sharpness; export settings remain unchanged.
+    1.1.5 – Spatial assignment follows QGIS intersects, including boundary-only contacts when no positive overlap exists.
+    1.1.4 – Apply X min/max bounds to every batch despite non-numeric X values; exclude non-numeric rows from a bounded numeric axis.
+    1.1.3 – HORS_ZONE CSV uses UTF-8 without BOM and comma delimiter; preview refreshes on selection change; polygon/line assignment uses maximum intersection measure with FID tie-break.
+    1.1.2 – Complete English translations for X range detection controls and messages.
+    1.1.1 – Detect X min/max from filtered and selected numeric values for duration tags.
+    1.1.0 – Generic spatial assignment to polygon layers, HORS_ZONE chart, CSV audit export, expression builder, per-series colours and filename preview.
+    1.0.0 – Initial release.
+changelog[fr]=1.1.7 – Ajout d'un bouton pour réinitialiser tous les paramètres du plugin à leurs valeurs par défaut.
+    1.1.6 – Aperçu rendu en 200 DPI pour une meilleure netteté, sans modifier les paramètres d'export.
+    1.1.5 – Le rattachement spatial suit le prédicat QGIS intersects, y compris les contacts de frontière lorsqu'aucun recouvrement positif n'existe.
+    1.1.4 – Appliquer les bornes X min/max à chaque lot même en présence de valeurs X non numériques ; exclure ces lignes de l'axe numérique borné.
+    1.1.3 – Export CSV HORS_ZONE en UTF-8 sans BOM et séparateur virgule ; actualisation automatique de l'aperçu selon la valeur sélectionnée ; rattachement des polygones et lignes par intersection maximale avec départage par FID.
+    1.1.2 – Traduction anglaise complète des libellés et messages de détection des bornes X.
+    1.1.1 – Détection des bornes X à partir des valeurs numériques après filtre et sélection pour le calcul de la durée.
+    1.1.0 – Rattachement spatial générique aux couches polygonales, graphique HORS_ZONE, export CSV, constructeur d'expression, couleurs par série et aperçu du nom.
+    1.0.0 – Première version.
