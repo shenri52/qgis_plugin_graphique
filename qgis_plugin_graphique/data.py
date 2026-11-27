@@ -87,7 +87,10 @@ def read_rows_by_polygon(source_layer, polygon_layer, label_field, fields,
         row = {name: _value(feature, name) for name in wanted}
         geom = feature.geometry()
         match_value = None
+        matched = False
+        reason = "Géométrie absente"
         if geom is not None and not geom.isEmpty():
+            reason = "Aucun polygone ne contient le point représentatif"
             try:
                 representative = geom.pointOnSurface()
                 if representative is None or representative.isEmpty():
@@ -97,12 +100,15 @@ def read_rows_by_polygon(source_layer, polygon_layer, label_field, fields,
                     polygon = polygon_features.get(fid)
                     if polygon and polygon[0].intersects(representative):
                         match_value = polygon[1]
+                        matched = True
                         break
             except Exception:
                 match_value = None
-        if match_value is None:
+        row["__fid__"] = feature.id()
+        if not matched:
+            row["__motif__"] = reason
             outside.append(row)
         else:
-            row["__territoire__"] = str(match_value)
+            row["__territoire__"] = core.EMPTY_LABEL if match_value is None else str(match_value)
             assigned.append(row)
     return assigned, outside
