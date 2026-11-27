@@ -21,7 +21,7 @@ Elle généralise un script de suivi du drainage (graphiques par EPCI et pour le
 - **Aperçu** dans la fenêtre avant export.
 - **Export** dans le dossier de votre choix, en **PNG, JPEG, SVG, PDF ou TIFF**, avec résolution et taille réglables.
 - **Mode lot** : un graphique par valeur d'un champ (ex. un par territoire), plus un graphique global optionnel, avec une liste de valeurs à ignorer.
-- **Rattachement spatial facultatif** : associe chaque entité à une couche polygonale quelconque à partir d'un point représentatif (reprojection des coordonnées si nécessaire), sans créer ni modifier de champ dans la couche source. Les entités sans correspondance sont exclues du total territorial, peuvent produire un graphique `HORS_ZONE` et un CSV de contrôle. En cas de recouvrement, le polygone dont l'identifiant QGIS est le plus petit est retenu.
+- **Rattachement spatial facultatif** : associe chaque entité à une couche polygonale quelconque par plus grande surface d'intersection pour les sources polygonales, plus grande longueur d'intersection pour les sources linéaires, et point représentatif pour les sources ponctuelles (reprojection si nécessaire), sans créer ni modifier de champ dans la couche source. Les entités sans correspondance sont exclues du total territorial, peuvent produire un graphique `HORS_ZONE` et un CSV de contrôle. En cas de recouvrement, le polygone dont l'identifiant QGIS est le plus petit est retenu.
 - **Nom des fichiers personnalisable** avec des balises. La balise `{duree}` est calculée à partir des bornes X ; le bouton « Détecter les bornes X » renseigne ces bornes depuis les valeurs numériques retenues après filtre et sélection (le filtre ne définit donc pas lui-même la durée). Balises disponibles : `{couche}` `{x}` `{y}` `{type}` `{agregation}` `{valeur}` `{xmin}` `{xmax}` `{duree}` `{date}` (AAAAMMJJ) `{aamm}` (ex. 2611). L'extension est ajoutée automatiquement ; les caractères dangereux (`/`, `\`, `..`) sont retirés ; deux noms identiques sont rendus uniques ; un fichier existant n'est écrasé qu'après confirmation.
 - Interface en français ou en anglais selon la langue de QGIS ; réglages mémorisés.
 
@@ -48,6 +48,7 @@ Publier une version : mettre à jour `version` et `changelog` dans `metadata.txt
 
 ### Historique des versions
 
+- **1.1.3** – Export CSV HORS_ZONE en UTF-8 sans BOM et séparateur virgule ; actualisation automatique de l'aperçu ; rattachement des lignes et polygones par intersection maximale avec départage par FID.
 - **1.1.2** – Traduction anglaise complète des nouveaux libellés et messages de détection des bornes X.
 - **1.1.1** – Détection des bornes X après filtre et sélection pour faciliter le calcul de `{duree}`.
 - **1.1.0** – Rattachement spatial générique à une couche polygonale, graphique `HORS_ZONE`, export CSV de contrôle, constructeur d'expression, couleurs par série et aperçu du nom de fichier. 
@@ -69,7 +70,7 @@ Publier une version : mettre à jour `version` et `changelog` dans `metadata.txt
 - **Preview** in the dialog before exporting.
 - **Export** to the folder of your choice as **PNG, JPEG, SVG, PDF or TIFF**, with adjustable resolution and size.
 - **Batch mode**: one chart per value of a field, plus an optional global chart and a list of values to skip.
-- **Optional spatial assignment**: assigns source features to any polygon layer using a representative point (with CRS transformation if needed), without changing the source layer. Unmatched features are excluded from the territorial total and can produce a separate `HORS_ZONE` chart and audit CSV. For overlaps, the polygon with the lowest QGIS feature ID is selected.
+- **Optional spatial assignment**: assigns source features to any polygon layer using maximum intersection area for polygon sources, maximum intersection length for line sources, and the existing representative-point method for point sources (with CRS transformation if needed), without changing the source layer. Unmatched features are excluded from the territorial total and can produce a separate `HORS_ZONE` chart and audit CSV. For overlaps, the polygon with the lowest QGIS feature ID is selected.
 - **Customizable file names** with tags: `{couche}` (layer) `{x}` `{y}` `{type}` `{agregation}` `{valeur}` (batch value) `{xmin}` `{xmax}` `{duree}` (X range length) `{date}` (YYYYMMDD) `{aamm}` (e.g. 2611). The extension is added automatically, unsafe characters are removed, duplicate names are made unique, and existing files are only overwritten after confirmation.
 - Interface in French or English following the QGIS language; settings are remembered.
 
@@ -85,6 +86,7 @@ The plugin relies on **matplotlib**, bundled with QGIS on Windows and macOS. On 
 
 ### Version history
 
+- **1.1.3** – HORS_ZONE CSV uses UTF-8 without BOM and comma delimiter; preview refreshes when the selected value changes; line and polygon assignment uses maximum intersection measure with FID tie-break.
 - **1.1.2** – Complete English translations for the X range detection controls and messages.
 - **1.1.1** – Detect X min/max from filtered and selected numeric values for duration tags.
 - **1.1.0** – Generic spatial assignment to a polygon layer, `HORS_ZONE` chart and optional CSV audit export. 
