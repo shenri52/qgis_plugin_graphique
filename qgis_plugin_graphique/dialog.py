@@ -341,7 +341,7 @@ class GraphDialog(QDialog):
         self.polygon_combo.blockSignals(True)
         self.polygon_combo.clear()
         for layer in QgsProject.instance().mapLayers().values():
-            if isinstance(layer, QgsVectorLayer) and layer.geometryType() == 2:
+            if isinstance(layer, QgsVectorLayer) and getattr(layer, "geometryType", lambda: -1)() == 2:
                 self.polygon_combo.addItem(layer.name(), layer.id())
         index = self.polygon_combo.findData(previous) if previous else -1
         self.polygon_combo.setCurrentIndex(index if index >= 0 else 0)
@@ -351,7 +351,7 @@ class GraphDialog(QDialog):
     def _polygon_layer(self):
         layer_id = self.polygon_combo.currentData()
         layer = QgsProject.instance().mapLayer(layer_id) if layer_id else None
-        return layer if isinstance(layer, QgsVectorLayer) and layer.geometryType() == 2 else None
+        return layer if isinstance(layer, QgsVectorLayer) and getattr(layer, "geometryType", lambda: -1)() == 2 else None
 
     def _populate_polygon_fields(self, *_args):
         layer = self._polygon_layer()
@@ -666,23 +666,7 @@ class GraphDialog(QDialog):
                 csv_done = True
             except OSError as error:
                 self._warn(tr("Erreur d'écriture : %s") % error)
-        csv_done = False
-        if csv_target:
-            try:
-                csv_fields = list(dict.fromkeys(
-                    key for row in self._last_unmatched for key in row.keys()
-                    if key != "__territoire__"))
-                with open(csv_target, "w", newline="", encoding="utf-8-sig") as stream:
-                    writer = csv.DictWriter(stream, fieldnames=csv_fields, extrasaction="ignore",
-                                            delimiter=";")
-                    writer.writeheader()
-                    writer.writerows(self._last_unmatched)
-                csv_done = True
-            except OSError as error:
-                self._warn(tr("Erreur d'écriture : %s") % error)
         message = tr("%d graphique(s) exporté(s) dans :\n%s") % (done, folder)
-        if csv_done:
-            message += "\nCSV HORS_ZONE : " + os.path.basename(csv_target)
         if csv_done:
             message += "\nCSV HORS_ZONE : " + os.path.basename(csv_target)
         if skipped:
