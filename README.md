@@ -1,7 +1,7 @@
 # Graphique Couche
 
 [![QGIS](https://img.shields.io/badge/QGIS-3.28%2B-green)](https://qgis.org/)
-[![Tests](https://github.com/shenri52/qgis-plugin-graphique/actions/workflows/tests.yml/badge.svg)](https://github.com/shenri52/qgis-plugin-graphique/actions/workflows/tests.yml)
+[![Tests](https://github.com/shenri52/qgis_plugin_graphique/actions/workflows/tests.yml/badge.svg)](https://github.com/shenri52/qgis_plugin_graphique/actions/workflows/tests.yml)
 
 ## Français
 
@@ -24,7 +24,7 @@ Elle généralise un script de suivi du drainage (graphiques par EPCI et pour le
 
 ### Installation
 
-1. Téléchargez `qgis_plugin_graphique.zip` depuis la page [Releases](https://github.com/shenri52/qgis-plugin-graphique/releases).
+1. Téléchargez `qgis_plugin_graphique.zip` depuis la page [Releases](https://github.com/shenri52/qgis_plugin_graphique/releases).
 2. Dans QGIS, ouvrez **Extensions → Installer/Gérer les extensions → Installer depuis un ZIP**.
 3. Sélectionnez l'archive téléchargée.
 
@@ -69,7 +69,7 @@ The plugin can now perform the spatial assignment itself; no pre-existing territ
 
 ### Installation
 
-1. Download `qgis_plugin_graphique.zip` from the [Releases](https://github.com/shenri52/qgis-plugin-graphique/releases) page.
+1. Download `qgis_plugin_graphique.zip` from the [Releases](https://github.com/shenri52/qgis_plugin_graphique/releases) page.
 2. In QGIS, open **Plugins → Manage and Install Plugins → Install from ZIP**.
 3. Select the downloaded archive.
 
@@ -86,5 +86,5 @@ GPL-2.0. See [LICENSE](LICENSE).
 
 ## Project links
 
-- Source code: <https://github.com/shenri52/qgis-plugin-graphique>
-- Issue tracker: <https://github.com/shenri52/qgis-plugin-graphique/issues>
+- Source code: <https://github.com/shenri52/qgis_plugin_graphique>
+- Issue tracker: <https://github.com/shenri52/qgis_plugin_graphique/issues>
