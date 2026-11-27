@@ -1,1 +1,102 @@
-# qgis_plugin_graphique
+# Graphique Couche
+
+[![QGIS](https://img.shields.io/badge/QGIS-3.28%2B-green)](https://qgis.org/)
+[![Tests](https://github.com/shenri52/qgis-plugin-graphique/actions/workflows/tests.yml/badge.svg)](https://github.com/shenri52/qgis-plugin-graphique/actions/workflows/tests.yml)
+
+## Français
+
+**Graphique Couche** est une extension QGIS qui transforme la table attributaire de **n'importe quelle couche vectorielle** en graphique, avec aperçu, puis l'exporte en image. Elle est accessible depuis **Extensions → Graphique Couche** et depuis une icône de la barre d'outils.
+
+Elle généralise un script de suivi du drainage (graphiques par EPCI et pour le département) : le script n'est plus lié à une couche ni à des noms de champs.
+
+### Fonctionnalités
+
+- Choix de la **couche**, des **champs X** (un ou plusieurs) et du **champ Y**. Le premier champ X coché de la liste est l'axe ; les suivants forment les séries (barres groupées/empilées, plusieurs courbes). Glissez les champs pour changer l'ordre.
+- **Calcul** sur Y : somme, moyenne, médiane, minimum, maximum, comptage, ou aucune agrégation. Sans champ Y : comptage des entités.
+- **Types** : histogramme (barres), barres horizontales, barres empilées, courbe, aire, nuage de points, camembert, histogramme de distribution.
+- **Titre**, **libellés** des axes X et Y, **échelles min/max** (vide = automatique), couleur, légende, grille, valeurs affichées, rotation des étiquettes, graduations entières.
+- Filtre par **expression QGIS** et option « entités sélectionnées uniquement ».
+- **Aperçu** dans la fenêtre avant export.
+- **Export** dans le dossier de votre choix, en **PNG, JPEG, SVG, PDF ou TIFF**, avec résolution et taille réglables.
+- **Mode lot** : un graphique par valeur d'un champ (ex. un par EPCI), plus un graphique global optionnel, avec une liste de valeurs à ignorer.
+- **Nom des fichiers personnalisable** avec des balises : `{couche}` `{x}` `{y}` `{type}` `{agregation}` `{valeur}` `{xmin}` `{xmax}` `{duree}` `{date}` (AAAAMMJJ) `{aamm}` (ex. 2611). L'extension est ajoutée automatiquement ; les caractères dangereux (`/`, `\`, `..`) sont retirés ; deux noms identiques sont rendus uniques ; un fichier existant n'est écrasé qu'après confirmation.
+- Interface en français ou en anglais selon la langue de QGIS ; réglages mémorisés.
+
+### Reproduire le script « Drainage »
+
+Le script d'origine fait aussi des géotraitements (jointure spatiale, agrégation) et des exports d'atlas PDF : ces parties ne sont **pas** dans le plugin. Préparez d'abord une couche avec le champ de territoire (par exemple en joignant `SIREN_EPCI` par localisation), puis :
+
+| Réglage | Valeur |
+| --- | --- |
+| Champ X | `DATE` |
+| Champ Y / calcul | `S_DRAINEE_ha` / Somme (ou « Nombre d'entités ») |
+| Échelles X min / max | `2021` / `2025` (5 ans) ou `2016` / `2025` (10 ans) |
+| Lot | champ `SIREN_EPCI`, graphique global activé, libellé `DEPARTEMENT` |
+| Nom des fichiers | `{y}_{duree}Ans_{valeur}` |
+
+Avec le comptage, les fichiers s'appellent `NB_5Ans_<EPCI>.png` et `NB_5Ans_DEPARTEMENT.png`. Pour obtenir `SURF_HA_5Ans_<EPCI>.png`, écrivez `SURF_HA_{duree}Ans_{valeur}` dans le nom.
+
+### Installation
+
+1. Téléchargez `qgis_plugin_graphique.zip` depuis la page [Releases](https://github.com/shenri52/qgis-plugin-graphique/releases).
+2. Dans QGIS, ouvrez **Extensions → Installer/Gérer les extensions → Installer depuis un ZIP**.
+3. Sélectionnez l'archive téléchargée.
+
+Le plugin utilise **matplotlib**, fourni avec QGIS sous Windows et macOS. Sous Linux, installez le paquet `python3-matplotlib` s'il manque.
+
+### Développement et tests
+
+```bash
+pip install -r requirements-dev.txt
+python -m pytest test -q                 # logique, rendu, métadonnées, règles de sécurité
+python test/qt_smoke.py PyQt6 fr         # fenêtre avec une vraie pile Qt (PyQt5 ou PyQt6, fr ou en)
+bandit -r qgis_plugin_graphique -ll      # analyse de sécurité
+```
+
+Les tests tournent sans QGIS (un faux module `qgis` est fourni dans `test/qgis_stubs.py`). Ils ne remplacent pas un essai dans QGIS : testez toujours une version avant de la publier.
+
+Publier une version : mettre à jour `version` et `changelog` dans `metadata.txt`, puis créer une release GitHub dont le tag est identique à la version (`1.0.0` ou `v1.0.0`). L'action **Build QGIS Plugin ZIP** attache l'archive à la release.
+
+### Historique des versions
+
+- **1.0.0** – Première version.
+
+## English
+
+**Graphique Couche** (Layer Chart) is a QGIS plugin that turns the attribute table of **any vector layer** into a chart, with a preview, and exports it as an image. It is available from **Plugins → Layer Chart** and from a toolbar icon. It generalizes a drainage-monitoring script (charts per territory and for the whole department).
+
+### Features
+
+- Choose the **layer**, one or more **X fields** and the **Y field**. The first ticked X field in the list is the axis; the others form the series. Drag fields to reorder them.
+- **Calculation** on Y: sum, mean, median, min, max, count, or no aggregation. With no Y field, features are counted.
+- **Types**: bar, horizontal bar, stacked bar, line, area, scatter, pie, distribution histogram.
+- **Title**, X and Y **axis labels**, **min/max scales** (empty = automatic), colour, legend, grid, value labels, label rotation, integer ticks.
+- **QGIS expression** filter and “selected features only”.
+- **Preview** in the dialog before exporting.
+- **Export** to the folder of your choice as **PNG, JPEG, SVG, PDF or TIFF**, with adjustable resolution and size.
+- **Batch mode**: one chart per value of a field, plus an optional global chart and a list of values to skip.
+- **Customizable file names** with tags: `{couche}` (layer) `{x}` `{y}` `{type}` `{agregation}` `{valeur}` (batch value) `{xmin}` `{xmax}` `{duree}` (X range length) `{date}` (YYYYMMDD) `{aamm}` (e.g. 2611). The extension is added automatically, unsafe characters are removed, duplicate names are made unique, and existing files are only overwritten after confirmation.
+- Interface in French or English following the QGIS language; settings are remembered.
+
+The geoprocessing (spatial join, aggregation) and PDF atlas exports of the original script are not part of the plugin: prepare a layer that already holds the territory field.
+
+### Installation
+
+1. Download `qgis_plugin_graphique.zip` from the [Releases](https://github.com/shenri52/qgis-plugin-graphique/releases) page.
+2. In QGIS, open **Plugins → Manage and Install Plugins → Install from ZIP**.
+3. Select the downloaded archive.
+
+The plugin relies on **matplotlib**, bundled with QGIS on Windows and macOS. On Linux, install `python3-matplotlib` if it is missing.
+
+### Version history
+
+- **1.0.0** – Initial release.
+
+## License
+
+GPL-2.0. See [LICENSE](LICENSE).
+
+## Project links
+
+- Source code: <https://github.com/shenri52/qgis-plugin-graphique>
+- Issue tracker: <https://github.com/shenri52/qgis-plugin-graphique/issues>

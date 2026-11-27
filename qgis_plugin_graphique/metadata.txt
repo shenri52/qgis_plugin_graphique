@@ -1,0 +1,20 @@
+[general]
+name=Graphique Couche
+qgisMinimumVersion=3.28
+qgisMaximumVersion=3.99
+description=Creates bar, line, area, scatter, pie and histogram charts from any vector layer, with preview and export to PNG, JPEG, SVG, PDF or TIFF.
+description[fr]=Crée des graphiques (barres, courbes, aires, nuages de points, camemberts, histogrammes) à partir de n'importe quelle couche vectorielle, avec aperçu et export en PNG, JPEG, SVG, PDF ou TIFF.
+about=Standalone QGIS plugin to chart the attribute table of any vector layer. Pick the X field(s) and the Y field, a calculation (sum, mean, median, min, max, count), a chart type, titles, axis labels and min/max scales, preview the result and export it as an image in the folder of your choice. A batch mode produces one chart per value of a field (for example one per territory) plus an optional global chart, with fully customizable file names using tags such as {couche}, {y}, {duree} or {valeur}.
+about[fr]=Extension QGIS autonome pour représenter la table attributaire de n'importe quelle couche vectorielle. Choisissez le ou les champs X et le champ Y, un calcul (somme, moyenne, médiane, min, max, comptage), un type de graphique, des titres, des libellés d'axes et des échelles min/max, visualisez un aperçu puis exportez l'image dans le dossier de votre choix. Un mode lot produit un graphique par valeur d'un champ (par exemple un par territoire) plus un graphique global optionnel, avec des noms de fichiers entièrement personnalisables grâce aux balises {couche}, {y}, {duree} ou {valeur}.
+version=1.0.0
+author=shenri52
+email=shenri.hmn@gmail.com
+tracker=https://github.com/shenri52/qgis-plugin-graphique/issues
+repository=https://github.com/shenri52/qgis-plugin-graphique
+homepage=https://github.com/shenri52/qgis-plugin-graphique
+tags=chart, graph, plot, histogram, export, statistics, matplotlib
+icon=icon.png
+experimental=False
+deprecated=False
+changelog=1.0.0 – Initial release.
+changelog[fr]=1.0.0 – Première version.
