@@ -366,7 +366,7 @@ class GraphDialog(QDialog):
         color = QColorDialog.getColor(QColor(current), self)
         if color.isValid():
             self._series_colors[name] = core.valid_color(color.name())
-            item.setBackground(QColor(color.name())
+            item.setBackground(QColor(color.name()))
 
     def _request_cancel(self):
         self._cancel = True
