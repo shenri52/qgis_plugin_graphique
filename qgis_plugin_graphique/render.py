@@ -112,7 +112,7 @@ def _draw_lines(ax, data, spec, area):
 
 def _draw_scatter(ax, data, spec):
     positions = _positions(data)
-    colors = _colors(spec, len(data.series))
+    colors = _colors(spec, [series.name for series in data.series])
     for index, series in enumerate(data.series):
         xs = [positions[k] for k, _ in series.points]
         ys = [v for _, v in series.points]
