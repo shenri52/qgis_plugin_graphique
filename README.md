@@ -1,7 +1,7 @@
 # Graphique Couche
 
 [![QGIS](https://img.shields.io/badge/QGIS-3.28%2B-green)](https://qgis.org/)
-[![Tests](https://github.com/shenri52/qgis_plugin_graphique/actions/workflows/tests.yml/badge.svg)](https://github.com/shenri52/qgis_plugin_graphique/actions/workflows/tests.yml)
+[![Build ZIP](https://github.com/shenri52/qgis_plugin_graphique/actions/workflows/build-zip.yml/badge.svg)](https://github.com/shenri52/qgis_plugin_graphique/actions/workflows/build-zip.yml)
 
 ## Français
 
