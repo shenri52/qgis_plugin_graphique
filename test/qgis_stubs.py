@@ -162,4 +162,18 @@ def install(qt="PyQt6"):
     core.QgsExpression = FakeExpression
     core.NULL = NULL
     sys.modules["qgis.core"] = core
+    gui = types.ModuleType("qgis.gui")
+
+    class FakeExpressionBuilderDialog:
+        def __init__(self, layer, expression="", parent=None):
+            self._expression = expression
+
+        def exec(self):
+            return 0
+
+        def expressionText(self):
+            return self._expression
+
+    gui.QgsExpressionBuilderDialog = FakeExpressionBuilderDialog
+    sys.modules["qgis.gui"] = gui
     return mods
