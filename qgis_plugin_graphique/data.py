@@ -51,22 +51,22 @@ def read_rows(layer, fields, selected_only=False, expression="", cancelled=None)
 
 def read_rows_by_polygon(source_layer, polygon_layer, label_field, fields,
                          selected_only=False, expression="", cancelled=None):
-    """Associe chaque entité source à un polygone via un point représentatif.
+    """Associe les entités selon leur dimension géométrique.
 
-    Pour les géométries surfaciques, pointOnSurface garantit un point intérieur.
-    Les entités dont le point ne rencontre aucun polygone sont retournées à part.
-    En cas de recouvrement, le polygone de plus petit identifiant QGIS est retenu :
-    l'affectation est ainsi déterministe et une entité n'est jamais comptée deux fois.
+    Polygones : plus grande surface d'intersection.
+    Lignes : plus grande longueur d'intersection.
+    Points : point représentatif, avec départage par le plus petit FID.
+    En cas d'égalité de mesure, le plus petit FID est retenu.
     """
     if polygon_layer is None or polygon_layer.geometryType() != 2:
         raise core.ChartError("La couche de rattachement doit être une couche polygonale.")
     if label_field not in field_names(polygon_layer):
         raise core.ChartError("Le champ de libellé du polygone n'existe plus.")
-
     error = check_expression(expression)
     if error:
         raise core.ChartError(error)
 
+    source_geometry_type = source_layer.geometryType()
     transform = None
     if source_layer.crs() != polygon_layer.crs():
         if not source_layer.crs().isValid() or not polygon_layer.crs().isValid():
@@ -101,24 +101,57 @@ def read_rows_by_polygon(source_layer, polygon_layer, label_field, fields,
         matched = False
         reason = "Géométrie absente"
         if geom is not None and not geom.isEmpty():
-            reason = "Aucun polygone ne contient le point représentatif"
             try:
-                representative = geom.pointOnSurface()
-                if representative is None or representative.isEmpty():
-                    representative = geom.centroid()
-                if transform is not None:
-                    result = representative.transform(transform)
-                    if result != 0:
-                        raise ValueError("échec de la transformation de SCR")
-                candidate_ids = sorted(index.intersects(representative.boundingBox()))
-                for fid in candidate_ids:
-                    polygon = polygon_features.get(fid)
-                    if polygon and polygon[0].intersects(representative):
-                        match_value = polygon[1]
-                        matched = True
-                        break
+                if source_geometry_type in (1, 2):
+                    # Les mesures sont calculées dans le SCR de la couche polygonale.
+                    source_geom = geom
+                    if transform is not None:
+                        result = source_geom.transform(transform)
+                        if result != 0:
+                            raise ValueError("échec de la transformation de SCR")
+                    candidate_ids = sorted(index.intersects(source_geom.boundingBox()))
+                    best_measure = 0.0
+                    best_fid = None
+                    reason = ("Aucune intersection surfacique avec un polygone"
+                              if source_geometry_type == 2
+                              else "Aucune intersection linéaire avec un polygone")
+                    for fid in candidate_ids:
+                        polygon = polygon_features.get(fid)
+                        if polygon is None:
+                            continue
+                        intersection = source_geom.intersection(polygon[0])
+                        if intersection is None or intersection.isEmpty():
+                            continue
+                        measure = (intersection.area() if source_geometry_type == 2
+                                   else intersection.length())
+                        # Une touche de frontière (mesure nulle) ne crée pas de rattachement.
+                        if measure > best_measure or (
+                                measure > 0 and measure == best_measure and
+                                (best_fid is None or fid < best_fid)):
+                            best_measure = measure
+                            best_fid = fid
+                            match_value = polygon[1]
+                    matched = best_fid is not None
+                else:
+                    # Conserver la méthode actuelle pour les couches ponctuelles.
+                    representative = geom.pointOnSurface()
+                    if representative is None or representative.isEmpty():
+                        representative = geom.centroid()
+                    if transform is not None:
+                        result = representative.transform(transform)
+                        if result != 0:
+                            raise ValueError("échec de la transformation de SCR")
+                    candidate_ids = sorted(index.intersects(representative.boundingBox()))
+                    reason = "Aucun polygone ne contient le point représentatif"
+                    for fid in candidate_ids:
+                        polygon = polygon_features.get(fid)
+                        if polygon and polygon[0].intersects(representative):
+                            match_value = polygon[1]
+                            matched = True
+                            break
             except Exception:
                 match_value = None
+                matched = False
                 reason = "Erreur de géométrie ou de reprojection"
         row["__fid__"] = feature.id()
         if not matched:
