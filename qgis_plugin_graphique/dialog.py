@@ -348,11 +348,12 @@ class GraphDialog(QDialog):
         self.bins_label.setVisible(chart_type == "hist")
         spatial_on = self.spatial_check.isChecked()
         batch_on = bool(self.batch_combo.currentData()) and not spatial_on
+        group_on = batch_on or spatial_on
         self.batch_combo.setEnabled(not spatial_on)
         for widget in (self.include_global, self.global_label, self.ignore_edit):
-            widget.setEnabled(batch_on)
-        self.preview_value.setVisible(batch_on)
-        self.preview_value_label.setVisible(batch_on)
+            widget.setEnabled(group_on)
+        self.preview_value.setVisible(group_on)
+        self.preview_value_label.setVisible(group_on)
         for widget in (self.polygon_combo, self.polygon_field_combo,
                        self.hors_zone_check, self.csv_check):
             widget.setEnabled(spatial_on)
