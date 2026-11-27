@@ -155,14 +155,22 @@ def build_chart_data(rows, x_fields, y_field, how, sort, chart_type, y_name="",
 
     axis_values = [normalize_value(r.get(axis)) for r in rows]
     present = [v for v in axis_values if v is not None]
-    numeric_x = bool(present) and all(to_number(v) is not None for v in present)
+    numeric_values = [to_number(v) for v in present]
+    has_x_range = xmin is not None or xmax is not None
+    # Avec des bornes X explicites, un champ d'années reste numérique même si
+    # certaines lignes du lot contiennent une valeur non numérique. Ces lignes
+    # sont écartées au lieu de faire basculer tout le lot en axe catégoriel.
+    numeric_x = bool(present) and (
+        all(value is not None for value in numeric_values)
+        or (has_x_range and any(value is not None for value in numeric_values))
+    )
 
     series_order, grouped, key_order = [], {}, []
     for row, raw_x in zip(rows, axis_values):
         if numeric_x:
-            if raw_x is None:
-                continue
             key = to_number(raw_x)
+            if key is None:
+                continue
             if (xmin is not None and key < xmin) or (xmax is not None and key > xmax):
                 continue
         else:
