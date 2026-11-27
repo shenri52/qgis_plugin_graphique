@@ -47,11 +47,19 @@ class FakeField:
 
 
 class FakeFeature:
-    def __init__(self, values):
+    def __init__(self, values, geometry=None, fid=0):
         self._values = values
+        self._geometry = geometry
+        self._fid = fid
 
     def __getitem__(self, key):
         return self._values[key]
+
+    def geometry(self):
+        return self._geometry
+
+    def id(self):
+        return self._fid
 
 
 class FakeRequest:
@@ -66,6 +74,28 @@ class FakeRequest:
 
     def setFilterExpression(self, text):  # noqa: N802
         self.expression = text
+
+
+class FakeCoordinateTransform:
+    def __init__(self, *_args, **_kwargs):
+        pass
+
+
+class FakeSpatialIndex:
+    def __init__(self, *_args, **_kwargs):
+        self.features = []
+
+    def addFeature(self, feature):  # noqa: N802
+        self.features.append(feature)
+
+    def intersects(self, rectangle):
+        xmin, ymin, xmax, ymax = rectangle
+        found = []
+        for feature in self.features:
+            bounds = feature.geometry().boundingBox()
+            if bounds[0] <= xmax and bounds[2] >= xmin and bounds[1] <= ymax and bounds[3] >= ymin:
+                found.append(feature.id())
+        return found
 
 
 class FakeExpression:
@@ -159,7 +189,23 @@ def install(qt="PyQt6"):
     core.QgsProject = FakeProject
     core.QgsVectorLayer = QgsVectorLayer
     core.QgsFeatureRequest = FakeRequest
+    core.QgsSpatialIndex = FakeSpatialIndex
+    core.QgsCoordinateTransform = FakeCoordinateTransform
     core.QgsExpression = FakeExpression
     core.NULL = NULL
     sys.modules["qgis.core"] = core
+    gui = types.ModuleType("qgis.gui")
+
+    class FakeExpressionBuilderDialog:
+        def __init__(self, layer, expression="", parent=None):
+            self._expression = expression
+
+        def exec(self):
+            return 0
+
+        def expressionText(self):
+            return self._expression
+
+    gui.QgsExpressionBuilderDialog = FakeExpressionBuilderDialog
+    sys.modules["qgis.gui"] = gui
     return mods
