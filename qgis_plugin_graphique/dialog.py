@@ -738,14 +738,18 @@ class GraphDialog(QDialog):
         csv_done = False
         if csv_target:
             try:
-                csv_fields = list(dict.fromkeys(
-                    [key for row in self._last_unmatched for key in row.keys()
-                     if key != "__territoire__"]))
+                attribute_fields = list(dict.fromkeys(
+                    key for row in self._last_unmatched for key in row.keys()
+                    if not key.startswith("__")))
+                csv_fields = ["ID_SOURCE", "MOTIF"] + attribute_fields
                 with open(csv_target, "w", newline="", encoding="utf-8-sig") as stream:
                     writer = csv.DictWriter(stream, fieldnames=csv_fields, extrasaction="ignore",
                                             delimiter=";")
                     writer.writeheader()
-                    writer.writerows(self._last_unmatched)
+                    for row in self._last_unmatched:
+                        record = {"ID_SOURCE": row.get("__fid__"), "MOTIF": row.get("__motif__")}
+                        record.update({key: row.get(key) for key in attribute_fields})
+                        writer.writerow(record)
                 csv_done = True
             except OSError as error:
                 self._warn(tr("Erreur d'écriture : %s") % error)
@@ -771,8 +775,6 @@ class GraphDialog(QDialog):
             "values": self.values_check.isChecked(), "spines": self.spines_check.isChecked(),
             "inty": self.intY_check.isChecked(), "allticks": self.allticks_check.isChecked(),
             "global_label": self.global_label.text(), "include_global": self.include_global.isChecked(),
-            "spatial": self.spatial_check.isChecked(), "hors_zone_chart": self.hors_zone_check.isChecked(),
-            "hors_zone_csv": self.csv_check.isChecked(),
             "spatial": self.spatial_check.isChecked(), "hors_zone_chart": self.hors_zone_check.isChecked(),
             "hors_zone_csv": self.csv_check.isChecked(),
         }
@@ -811,10 +813,6 @@ class GraphDialog(QDialog):
         self.allticks_check.setChecked(get("allticks", True, bool))
         self.global_label.setText(get("global_label", "TOTAL"))
         self.include_global.setChecked(get("include_global", True, bool))
-        self.spatial_check.setChecked(get("spatial", False, bool))
-        self.hors_zone_check.setChecked(get("hors_zone_chart", True, bool))
-        self.csv_check.setChecked(get("hors_zone_csv", False, bool))
-        self._update_visibility()
         self.spatial_check.setChecked(get("spatial", False, bool))
         self.hors_zone_check.setChecked(get("hors_zone_chart", True, bool))
         self.csv_check.setChecked(get("hors_zone_csv", False, bool))
