@@ -83,14 +83,17 @@ class GraphDialog(QDialog):
         self.cancel_button = QPushButton(tr("Annuler"))
         self.cancel_button.setVisible(False)
         self.close_button = QPushButton(tr("Fermer"))
+        self.reset_button = QPushButton(tr("Réinitialiser les paramètres"))
         self.preview_button.clicked.connect(self._preview)
         self.export_button.clicked.connect(self._export)
         self.cancel_button.clicked.connect(self._request_cancel)
         self.close_button.clicked.connect(self.close)
+        self.reset_button.clicked.connect(self._reset_settings)
 
         buttons = QHBoxLayout()
         buttons.addWidget(self.progress, 1)
-        for button in (self.preview_button, self.export_button, self.cancel_button, self.close_button):
+        for button in (self.preview_button, self.export_button, self.cancel_button,
+                       self.reset_button, self.close_button):
             buttons.addWidget(button)
         layout = QVBoxLayout(self)
         layout.addWidget(splitter, 1)
@@ -712,7 +715,7 @@ class GraphDialog(QDialog):
             self._set_busy(False)
 
     def _set_busy(self, busy):
-        for button in (self.export_button, self.preview_button, self.close_button):
+        for button in (self.export_button, self.preview_button, self.reset_button, self.close_button):
             button.setEnabled(not busy)
         self.cancel_button.setVisible(busy)
         self.progress.setVisible(busy)
@@ -801,6 +804,72 @@ class GraphDialog(QDialog):
                 len(skipped), ", ".join(skipped))
         QMessageBox.information(self, tr("Information"), message)
         self._save_settings()
+
+    def _reset_settings(self):
+        """Restaure les valeurs par défaut et efface les réglages mémorisés."""
+        answer = QMessageBox.question(
+            self, tr("Réinitialiser les paramètres"),
+            tr("Tous les paramètres seront remis à leurs valeurs par défaut. Continuer ?"),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No)
+        if answer != QMessageBox.StandardButton.Yes:
+            return
+        QgsSettings().remove(SETTINGS_PREFIX)
+
+        # Données
+        self.layer_combo.setCurrentIndex(0)
+        self.selected_only.setChecked(False)
+        self.filter_edit.clear()
+        for index in range(self.x_list.count()):
+            self.x_list.item(index).setCheckState(Qt.CheckState.Unchecked)
+        self.y_combo.setCurrentIndex(0)
+        self.agg_combo.setCurrentIndex(0)
+        self.sort_combo.setCurrentIndex(0)
+        self.batch_combo.setCurrentIndex(0)
+        self.include_global.setChecked(True)
+        self.global_label.setText("TOTAL")
+        self.ignore_edit.clear()
+        self.spatial_check.setChecked(False)
+        self.polygon_combo.setCurrentIndex(0)
+        self._populate_polygon_fields()
+        self.hors_zone_check.setChecked(True)
+        self.csv_check.setChecked(False)
+
+        # Graphique
+        self.type_combo.setCurrentIndex(0)
+        for edit in (self.title_edit, self.xlabel_edit, self.ylabel_edit,
+                     self.xmin_edit, self.xmax_edit, self.ymin_edit, self.ymax_edit):
+            edit.clear()
+        self._color = core.DEFAULT_COLOR
+        self._apply_color_style()
+        self._series_colors.clear()
+        self.series_color_list.clear()
+        self.bins_spin.setValue(10)
+        self.rotation_spin.setValue(0)
+        self.legend_check.setChecked(True)
+        self.grid_check.setChecked(False)
+        self.values_check.setChecked(False)
+        self.spines_check.setChecked(True)
+        self.intY_check.setChecked(True)
+        self.allticks_check.setChecked(True)
+
+        # Export
+        self.folder_edit.clear()
+        self.pattern_combo.setCurrentText(PRESET_NAMES[1])
+        self.format_combo.setCurrentIndex(0)
+        self.dpi_spin.setValue(200)
+        self.width_spin.setValue(5.85)
+        self.height_spin.setValue(4.13)
+
+        # Aperçu
+        self._preview_plan = None
+        self._preview_spec = None
+        self._pixmap = None
+        self.preview_value.clear()
+        self.preview_label.setPixmap(QPixmap())
+        self.preview_label.setText(tr("Cliquez sur « Aperçu » pour afficher le graphique."))
+        self._update_visibility()
+        self._update_filename_preview()
 
     # ------------------------------------------------------------------ mémorisation
     def _save_settings(self):
