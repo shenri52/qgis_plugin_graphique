@@ -357,6 +357,7 @@ class GraphDialog(QDialog):
         row = QHBoxLayout()
         self.preview_value_label = QLabel(tr("Aperçu pour"))
         self.preview_value = QComboBox()
+        self.preview_value.currentIndexChanged.connect(self._render_selected_preview)
         row.addWidget(self.preview_value_label)
         row.addWidget(self.preview_value, 1)
         layout.addLayout(row)
@@ -638,12 +639,22 @@ class GraphDialog(QDialog):
         index = self.preview_value.findText(wanted) if wanted else -1
         self.preview_value.setCurrentIndex(index if index >= 0 else 0)
         self.preview_value.blockSignals(False)
-        label, chart, error = plan[self.preview_value.currentIndex()]
+        self._preview_plan = plan
+        self._preview_spec = job["spec"]
+        self._render_selected_preview()
+
+    def _render_selected_preview(self, *_args):
+        """Rafraîchit l'image pour la valeur choisie dans « Aperçu pour »."""
+        plan = getattr(self, "_preview_plan", None)
+        if not plan or self.preview_value.currentIndex() < 0:
+            return
+        _label, chart, error = plan[self.preview_value.currentIndex()]
         if chart is None:
-            self._warn(tr("Aucune donnée à tracer : %s") % error)
+            self.preview_label.setText(tr("Aucune donnée à tracer : %s") % error)
+            self._pixmap = None
             return
         try:
-            png = render.render_png_bytes(chart, job["spec"])
+            png = render.render_png_bytes(chart, self._preview_spec)
         except core.ChartError as error:
             self._warn(tr("Aucune donnée à tracer : %s") % error)
             return
@@ -771,9 +782,9 @@ class GraphDialog(QDialog):
                     key for row in self._last_unmatched for key in row.keys()
                     if not key.startswith("__")))
                 csv_fields = ["ID_SOURCE", "MOTIF"] + attribute_fields
-                with open(csv_target, "w", newline="", encoding="utf-8-sig") as stream:
+                with open(csv_target, "w", newline="", encoding="utf-8") as stream:
                     writer = csv.DictWriter(stream, fieldnames=csv_fields, extrasaction="ignore",
-                                            delimiter=";")
+                                            delimiter=",")
                     writer.writeheader()
                     for row in self._last_unmatched:
                         record = {"ID_SOURCE": row.get("__fid__"), "MOTIF": row.get("__motif__")}
