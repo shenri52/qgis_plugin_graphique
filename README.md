@@ -14,7 +14,7 @@ Elle généralise un script de suivi du drainage (graphiques par EPCI et pour le
 - Choix de la **couche**, des **champs X** (un ou plusieurs) et du **champ Y**. Le premier champ X coché de la liste est l'axe ; les suivants forment les séries (barres groupées/empilées, plusieurs courbes). Glissez les champs pour changer l'ordre.
 - **Calcul** sur Y : somme, moyenne, médiane, minimum, maximum, comptage, ou aucune agrégation. Sans champ Y : comptage des entités.
 - **Types** : histogramme (barres), barres horizontales, barres empilées, courbe, aire, nuage de points, camembert, histogramme de distribution.
-- **Titre**, **libellés** des axes X et Y, **échelles min/max** (vide = automatique), détection des bornes X à partir des données après filtre, couleur par série, légende, grille, valeurs affichées, rotation des étiquettes, graduations entières.
+- **Titre**, **libellés** des axes X et Y, **échelles min/max** (vide = automatique), détection des bornes X à partir des données après filtre et sélection (bouton dédié), couleur par série, légende, grille, valeurs affichées, rotation des étiquettes, graduations entières.
 - Filtre par **expression QGIS** avec constructeur d'expression et option « entités sélectionnées uniquement ».
 - **Couleurs individuelles des séries** configurables après l'aperçu.
 - **Aperçu du nom de fichier** sous la formule de nommage.
@@ -48,6 +48,7 @@ Publier une version : mettre à jour `version` et `changelog` dans `metadata.txt
 
 ### Historique des versions
 
+- **1.1.2** – Traduction anglaise complète des nouveaux libellés et messages de détection des bornes X.
 - **1.1.1** – Détection des bornes X après filtre et sélection pour faciliter le calcul de `{duree}`.
 - **1.1.0** – Rattachement spatial générique à une couche polygonale, graphique `HORS_ZONE`, export CSV de contrôle, constructeur d'expression, couleurs par série et aperçu du nom de fichier. 
 - **1.0.0** – Première version.
@@ -61,7 +62,7 @@ Publier une version : mettre à jour `version` et `changelog` dans `metadata.txt
 - Choose the **layer**, one or more **X fields** and the **Y field**. The first ticked X field in the list is the axis; the others form the series. Drag fields to reorder them.
 - **Calculation** on Y: sum, mean, median, min, max, count, or no aggregation. With no Y field, features are counted.
 - **Types**: bar, horizontal bar, stacked bar, line, area, scatter, pie, distribution histogram.
-- **Title**, X and Y **axis labels**, **min/max scales** (empty = automatic), per-series colours, legend, grid, value labels, label rotation, integer ticks.
+- **Title**, X and Y **axis labels**, **min/max scales** (empty = automatic), a dedicated button to detect the X range from filtered and selected data, per-series colours, legend, grid, value labels, label rotation, integer ticks.
 - **QGIS expression** filter with expression builder and “selected features only”.
 - Individually configurable series colours after preview.
 - File name preview below the naming pattern.
@@ -84,6 +85,8 @@ The plugin relies on **matplotlib**, bundled with QGIS on Windows and macOS. On 
 
 ### Version history
 
+- **1.1.2** – Complete English translations for the X range detection controls and messages.
+- **1.1.1** – Detect X min/max from filtered and selected numeric values for duration tags.
 - **1.1.0** – Generic spatial assignment to a polygon layer, `HORS_ZONE` chart and optional CSV audit export. 
 - **1.0.0** – Initial release.
 
