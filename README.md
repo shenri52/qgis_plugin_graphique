@@ -66,7 +66,8 @@ Publier une version : mettre à jour `version` et `changelog` dans `metadata.txt
 - File name preview below the naming pattern.
 - **Preview** in the dialog before exporting.
 - **Export** to the folder of your choice as **PNG, JPEG, SVG, PDF or TIFF**, with adjustable resolution and size.
-- **Batch mode**: one chart per value of a field, plus an optional global chart and a list of values to skip.\n- **Optional spatial assignment**: assigns source features to any polygon layer using a representative point (with CRS transformation if needed), without changing the source layer. Unmatched features are excluded from the territorial total and can produce a separate `HORS_ZONE` chart and audit CSV. For overlaps, the polygon with the lowest QGIS feature ID is selected.
+- **Batch mode**: one chart per value of a field, plus an optional global chart and a list of values to skip.
+- **Optional spatial assignment**: assigns source features to any polygon layer using a representative point (with CRS transformation if needed), without changing the source layer. Unmatched features are excluded from the territorial total and can produce a separate `HORS_ZONE` chart and audit CSV. For overlaps, the polygon with the lowest QGIS feature ID is selected.
 - **Customizable file names** with tags: `{couche}` (layer) `{x}` `{y}` `{type}` `{agregation}` `{valeur}` (batch value) `{xmin}` `{xmax}` `{duree}` (X range length) `{date}` (YYYYMMDD) `{aamm}` (e.g. 2611). The extension is added automatically, unsafe characters are removed, duplicate names are made unique, and existing files are only overwritten after confirmation.
 - Interface in French or English following the QGIS language; settings are remembered.
 
