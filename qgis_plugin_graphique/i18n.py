@@ -62,6 +62,14 @@ EN = {
     "Échelles (vide = automatique)": "Scales (empty = automatic)",
     "X min": "X min",
     "X max": "X max",
+    "Détecter les bornes X": "Detect X range",
+    "Calcule les bornes à partir des valeurs X réellement retenues après le filtre.":
+        "Detects the range from X values retained after applying the filter.",
+    "Choisissez une couche et cochez au moins un champ X.":
+        "Choose a layer and tick at least one X field.",
+    "Impossible de détecter les bornes X : %s": "Could not detect the X range: %s",
+    "Aucune valeur X numérique disponible après application du filtre.":
+        "No numeric X values are available after applying the filter.",
     "Y min": "Y min",
     "Y max": "Y max",
     "Pour un X numérique, les données hors de la plage X sont ignorées.":
