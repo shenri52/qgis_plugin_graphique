@@ -112,6 +112,7 @@ def read_rows_by_polygon(source_layer, polygon_layer, label_field, fields,
                     candidate_ids = sorted(index.intersects(source_geom.boundingBox()))
                     best_measure = 0.0
                     best_fid = None
+                    touching_fids = []
                     reason = ("Aucune intersection surfacique avec un polygone"
                               if source_geometry_type == 2
                               else "Aucune intersection linéaire avec un polygone")
@@ -119,18 +120,26 @@ def read_rows_by_polygon(source_layer, polygon_layer, label_field, fields,
                         polygon = polygon_features.get(fid)
                         if polygon is None:
                             continue
+                        # Le prédicat intersects inclut aussi les contacts de frontière
+                        # (surface/longueur nulle), comme l'outil de sélection spatiale QGIS.
+                        if source_geom.intersects(polygon[0]):
+                            touching_fids.append(fid)
                         intersection = source_geom.intersection(polygon[0])
                         if intersection is None or intersection.isEmpty():
                             continue
                         measure = (intersection.area() if source_geometry_type == 2
                                    else intersection.length())
-                        # Une touche de frontière (mesure nulle) ne crée pas de rattachement.
                         if measure > best_measure or (
                                 measure > 0 and measure == best_measure and
                                 (best_fid is None or fid < best_fid)):
                             best_measure = measure
                             best_fid = fid
                             match_value = polygon[1]
+                    if best_fid is None and touching_fids:
+                        # Aucun recouvrement de mesure positive : retenir le plus petit FID
+                        # parmi les géométries qui se touchent réellement.
+                        best_fid = min(touching_fids)
+                        match_value = polygon_features[best_fid][1]
                     matched = best_fid is not None
                 else:
                     # Conserver la méthode actuelle pour les couches ponctuelles.
