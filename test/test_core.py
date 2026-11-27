@@ -95,6 +95,20 @@ def test_x_range_filters_numeric_axis():
         core.build_chart_data(ROWS, ["DATE"], "S", "sum", "x_asc", "bar", xmin=2030)
 
 
+def test_x_range_filters_numeric_values_even_with_non_numeric_rows():
+    rows = [
+        {"DATE": 2020, "S": 1},
+        {"DATE": "non renseignée", "S": 2},
+        {"DATE": 2022, "S": 3},
+        {"DATE": 2025, "S": 4},
+    ]
+    data = core.build_chart_data(rows, ["DATE"], "S", "sum", "x_asc", "bar",
+                                 xmin=2021, xmax=2023)
+    assert data.numeric_x
+    assert data.categories == [2022.0]
+    assert points(data.series[0]) == {2022.0: 3.0}
+
+
 def test_multiple_x_fields_make_series():
     data = core.build_chart_data(ROWS, ["DATE", "EPCI"], "S", "sum", "x_asc", "stacked")
     assert [s.name for s in data.series] == ["A", "B"]
