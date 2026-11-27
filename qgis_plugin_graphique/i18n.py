@@ -67,6 +67,8 @@ EN = {
     "Pour un X numérique, les données hors de la plage X sont ignorées.":
         "For a numeric X, data outside the X range is ignored.",
     "Couleur": "Color",
+    "Couleurs des séries (après aperçu)": "Series colours (after preview)",
+    "Double-cliquez sur une série pour choisir sa couleur.": "Double-click a series to choose its colour.",
     "Choisir…": "Choose…",
     "Classes (histogramme)": "Bins (histogram)",
     "Rotation des étiquettes X": "X label rotation",
