@@ -61,6 +61,7 @@ class GraphDialog(QDialog):
         self.refresh_layers()
         self._load_settings()
         self._update_visibility()
+        self._update_filename_preview()
 
     # ------------------------------------------------------------------ interface
     def _build_ui(self):
@@ -460,6 +461,7 @@ class GraphDialog(QDialog):
             combo.setCurrentIndex(index if index >= 0 else 0)
         self.preview_value.clear()
         self._update_visibility()
+        self._update_filename_preview()
 
     # ------------------------------------------------------------------ lecture des réglages
     def _gather(self, need_output):
