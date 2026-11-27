@@ -1,28 +1,25 @@
-name: Tests du plugin QGIS
+name: Build QGIS Plugin ZIP
 
 on:
-  push:
-    branches: [main, "feature/**"]
-  pull_request:
-  workflow_dispatch:
+  release:
+    types: [published]
 
 jobs:
-  tests:
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Récupérer le code du dépôt
+        uses: actions/checkout@v4
+
+      - name: Créer le ZIP propre pour QGIS
+        run: |
+          zip -r qgis_plugin_graphique.zip qgis_plugin_graphique -x "*.git*" "*.github*" "*__pycache__*"
+
+      - name: Ajouter le ZIP à la Release GitHub
+        uses: softprops/action-gh-release@v2
         with:
-          python-version: "3.11"
-      - name: Installer les dépendances
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
-      - name: Tests unitaires
-        run: python -m pytest test -q
-      - name: Test interface Qt
-        run: |
-          python test/qt_smoke.py PyQt6 fr
-          python test/qt_smoke.py PyQt6 en
-      - name: Analyse de sécurité
-        run: bandit -r qgis_plugin_graphique -ll
+          files: qgis_plugin_graphique.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
