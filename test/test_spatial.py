@@ -32,6 +32,33 @@ class FakeGeometry:
         x1, y1, x2, y2 = self.bounds
         return x1 <= x <= x2 and y1 <= y <= y2
 
+    def intersection(self, other):
+        x1 = max(self.bounds[0], other.bounds[0])
+        y1 = max(self.bounds[1], other.bounds[1])
+        x2 = min(self.bounds[2], other.bounds[2])
+        y2 = min(self.bounds[3], other.bounds[3])
+        if x2 < x1 or y2 < y1:
+            return FakeMeasure(0, 0)
+        if self.bounds[1] == self.bounds[3]:  # ligne horizontale
+            return FakeMeasure(0, max(0, x2 - x1))
+        if self.bounds[0] == self.bounds[2]:  # ligne verticale
+            return FakeMeasure(0, max(0, y2 - y1))
+        return FakeMeasure(max(0, (x2 - x1) * (y2 - y1)), 0)
+
+
+class FakeMeasure:
+    def __init__(self, area, length):
+        self._area, self._length = area, length
+
+    def isEmpty(self):
+        return self._area == 0 and self._length == 0
+
+    def area(self):
+        return self._area
+
+    def length(self):
+        return self._length
+
 
 class FakeLayer:
     def __init__(self, records, fields, geometry_type=0):
@@ -77,3 +104,43 @@ def test_spatial_assignment_excludes_unmatched_and_is_deterministic():
     assert outside[0]["__motif__"] == "Aucun polygone ne contient le point représentatif"
     # L'entité dans deux polygones n'est comptée qu'une fois, dans le premier FID.
     assert len(assigned) == 2
+
+
+
+def test_polygon_source_uses_largest_intersection_area():
+    polygons = FakeLayer([
+        qgis_stubs.FakeFeature({"CODE": "A"}, FakeGeometry((0, 0, 5, 10)), 1),
+        qgis_stubs.FakeFeature({"CODE": "B"}, FakeGeometry((4, 0, 10, 10)), 2),
+    ], ["CODE"], geometry_type=2)
+    source = FakeLayer([
+        qgis_stubs.FakeFeature({"VALUE": 8}, FakeGeometry((2, 1, 8, 9)), 99),
+    ], ["VALUE"], geometry_type=2)
+
+    assigned, outside = data.read_rows_by_polygon(source, polygons, "CODE", ["VALUE"])
+
+    assert not outside
+    assert assigned[0]["__territoire__"] == "B"
+
+
+def test_line_source_uses_largest_intersection_length_and_fid_tie_break():
+    polygons = FakeLayer([
+        qgis_stubs.FakeFeature({"CODE": "A"}, FakeGeometry((0, 0, 4, 10)), 10),
+        qgis_stubs.FakeFeature({"CODE": "B"}, FakeGeometry((3, 0, 10, 10)), 20),
+    ], ["CODE"], geometry_type=2)
+    source = FakeLayer([
+        qgis_stubs.FakeFeature({"VALUE": 8}, FakeGeometry((0, 5, 10, 5)), 99),
+    ], ["VALUE"], geometry_type=1)
+
+    assigned, outside = data.read_rows_by_polygon(source, polygons, "CODE", ["VALUE"])
+
+    assert not outside
+    assert assigned[0]["__territoire__"] == "B"
+
+    # Deux intersections de même longueur : le plus petit FID gagne.
+    tied_polygons = FakeLayer([
+        qgis_stubs.FakeFeature({"CODE": "B"}, FakeGeometry((3, 0, 10, 10)), 20),
+        qgis_stubs.FakeFeature({"CODE": "A"}, FakeGeometry((0, 0, 7, 10)), 10),
+    ], ["CODE"], geometry_type=2)
+    assigned, outside = data.read_rows_by_polygon(source, tied_polygons, "CODE", ["VALUE"])
+    assert not outside
+    assert assigned[0]["__territoire__"] == "A"
