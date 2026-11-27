@@ -303,6 +303,7 @@ class ChartSpec:
     ymin: float = None
     ymax: float = None
     color: str = DEFAULT_COLOR
+    series_colors: dict = field(default_factory=dict)
     width: float = 5.85
     height: float = 4.13
     dpi: int = 200
