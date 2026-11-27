@@ -69,7 +69,13 @@ def read_rows_by_polygon(source_layer, polygon_layer, label_field, fields,
 
     transform = None
     if source_layer.crs() != polygon_layer.crs():
-        transform = QgsCoordinateTransform(source_layer.crs(), polygon_layer.crs(), QgsProject.instance())
+        if not source_layer.crs().isValid() or not polygon_layer.crs().isValid():
+            raise core.ChartError("Les deux couches doivent avoir un SCR défini pour être reprojetées.")
+        try:
+            transform = QgsCoordinateTransform(
+                source_layer.crs(), polygon_layer.crs(), QgsProject.instance())
+        except Exception as error:
+            raise core.ChartError("Impossible de créer la transformation de SCR : %s" % error)
 
     polygon_features = {}
     index = QgsSpatialIndex()
@@ -101,7 +107,9 @@ def read_rows_by_polygon(source_layer, polygon_layer, label_field, fields,
                 if representative is None or representative.isEmpty():
                     representative = geom.centroid()
                 if transform is not None:
-                    representative.transform(transform)
+                    result = representative.transform(transform)
+                    if result != 0:
+                        raise ValueError("échec de la transformation de SCR")
                 candidate_ids = sorted(index.intersects(representative.boundingBox()))
                 for fid in candidate_ids:
                     polygon = polygon_features.get(fid)
