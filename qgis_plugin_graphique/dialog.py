@@ -378,6 +378,12 @@ class GraphDialog(QDialog):
         if message:
             self._warn(tr("Expression invalide : %s") % message)
             return None
+        spatial = self.spatial_check.isChecked()
+        polygon_layer = self._polygon_layer() if spatial else None
+        polygon_field = self.polygon_field_combo.currentData() if spatial else None
+        if spatial and (polygon_layer is None or not polygon_field):
+            self._warn(tr("Choisissez une couche polygonale et son champ de libellé."))
+            return None
         pattern = self.pattern_combo.currentText().strip()
         unknown = core.unknown_placeholders(pattern)
         if unknown:
@@ -573,7 +579,23 @@ class GraphDialog(QDialog):
                 return
             done += 1
             self.progress.setValue(done)
+        csv_done = False
+        if csv_target:
+            try:
+                csv_fields = list(dict.fromkeys(
+                    [key for row in self._last_unmatched for key in row.keys()
+                     if key != "__territoire__"]))
+                with open(csv_target, "w", newline="", encoding="utf-8-sig") as stream:
+                    writer = csv.DictWriter(stream, fieldnames=csv_fields, extrasaction="ignore",
+                                            delimiter=";")
+                    writer.writeheader()
+                    writer.writerows(self._last_unmatched)
+                csv_done = True
+            except OSError as error:
+                self._warn(tr("Erreur d'écriture : %s") % error)
         message = tr("%d graphique(s) exporté(s) dans :\n%s") % (done, folder)
+        if csv_done:
+            message += "\nCSV HORS_ZONE : " + os.path.basename(csv_target)
         if skipped:
             message += "\n\n" + tr("%d graphique(s) ignoré(s) (aucune donnée) : %s") % (
                 len(skipped), ", ".join(skipped))
@@ -593,6 +615,8 @@ class GraphDialog(QDialog):
             "values": self.values_check.isChecked(), "spines": self.spines_check.isChecked(),
             "inty": self.intY_check.isChecked(), "allticks": self.allticks_check.isChecked(),
             "global_label": self.global_label.text(), "include_global": self.include_global.isChecked(),
+            "spatial": self.spatial_check.isChecked(), "hors_zone_chart": self.hors_zone_check.isChecked(),
+            "hors_zone_csv": self.csv_check.isChecked(),
         }
         for key, value in values.items():
             settings.setValue(SETTINGS_PREFIX + key, value)
@@ -629,6 +653,10 @@ class GraphDialog(QDialog):
         self.allticks_check.setChecked(get("allticks", True, bool))
         self.global_label.setText(get("global_label", "TOTAL"))
         self.include_global.setChecked(get("include_global", True, bool))
+        self.spatial_check.setChecked(get("spatial", False, bool))
+        self.hors_zone_check.setChecked(get("hors_zone_chart", True, bool))
+        self.csv_check.setChecked(get("hors_zone_csv", False, bool))
+        self._update_visibility()
 
     def closeEvent(self, event):  # noqa: N802
         if self._running:
