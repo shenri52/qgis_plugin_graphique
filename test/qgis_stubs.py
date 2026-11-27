@@ -47,11 +47,19 @@ class FakeField:
 
 
 class FakeFeature:
-    def __init__(self, values):
+    def __init__(self, values, geometry=None, fid=0):
         self._values = values
+        self._geometry = geometry
+        self._fid = fid
 
     def __getitem__(self, key):
         return self._values[key]
+
+    def geometry(self):
+        return self._geometry
+
+    def id(self):
+        return self._fid
 
 
 class FakeRequest:
@@ -80,8 +88,14 @@ class FakeSpatialIndex:
     def addFeature(self, feature):  # noqa: N802
         self.features.append(feature)
 
-    def intersects(self, _rectangle):
-        return []
+    def intersects(self, rectangle):
+        xmin, ymin, xmax, ymax = rectangle
+        found = []
+        for feature in self.features:
+            bounds = feature.geometry().boundingBox()
+            if bounds[0] <= xmax and bounds[2] >= xmin and bounds[1] <= ymax and bounds[3] >= ymin:
+                found.append(feature.id())
+        return found
 
 
 class FakeExpression:
