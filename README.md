@@ -1,7 +1,7 @@
 # Graphique Couche
 
 [![QGIS](https://img.shields.io/badge/QGIS-3.28%2B-green)](https://qgis.org/)
-[![Tests](https://github.com/shenri52/qgis-plugin-graphique/actions/workflows/tests.yml/badge.svg)](https://github.com/shenri52/qgis-plugin-graphique/actions/workflows/tests.yml)
+[![Tests](https://github.com/shenri52/qgis_plugin_graphique/actions/workflows/tests.yml/badge.svg)](https://github.com/shenri52/qgis_plugin_graphique/actions/workflows/tests.yml)
 
 ## Français
 
@@ -14,17 +14,20 @@ Elle généralise un script de suivi du drainage (graphiques par EPCI et pour le
 - Choix de la **couche**, des **champs X** (un ou plusieurs) et du **champ Y**. Le premier champ X coché de la liste est l'axe ; les suivants forment les séries (barres groupées/empilées, plusieurs courbes). Glissez les champs pour changer l'ordre.
 - **Calcul** sur Y : somme, moyenne, médiane, minimum, maximum, comptage, ou aucune agrégation. Sans champ Y : comptage des entités.
 - **Types** : histogramme (barres), barres horizontales, barres empilées, courbe, aire, nuage de points, camembert, histogramme de distribution.
-- **Titre**, **libellés** des axes X et Y, **échelles min/max** (vide = automatique), couleur, légende, grille, valeurs affichées, rotation des étiquettes, graduations entières.
-- Filtre par **expression QGIS** et option « entités sélectionnées uniquement ».
+- **Titre**, **libellés** des axes X et Y, **échelles min/max** (vide = automatique), couleur par série, légende, grille, valeurs affichées, rotation des étiquettes, graduations entières.
+- Filtre par **expression QGIS** avec constructeur d'expression et option « entités sélectionnées uniquement ».
+- **Couleurs individuelles des séries** configurables après l'aperçu.
+- **Aperçu du nom de fichier** sous la formule de nommage.
 - **Aperçu** dans la fenêtre avant export.
 - **Export** dans le dossier de votre choix, en **PNG, JPEG, SVG, PDF ou TIFF**, avec résolution et taille réglables.
-- **Mode lot** : un graphique par valeur d'un champ (ex. un par EPCI), plus un graphique global optionnel, avec une liste de valeurs à ignorer.
+- **Mode lot** : un graphique par valeur d'un champ (ex. un par territoire), plus un graphique global optionnel, avec une liste de valeurs à ignorer.
+- **Rattachement spatial facultatif** : associe chaque entité à une couche polygonale quelconque à partir d'un point représentatif (reprojection des coordonnées si nécessaire), sans créer ni modifier de champ dans la couche source. Les entités sans correspondance sont exclues du total territorial, peuvent produire un graphique `HORS_ZONE` et un CSV de contrôle. En cas de recouvrement, le polygone dont l'identifiant QGIS est le plus petit est retenu.
 - **Nom des fichiers personnalisable** avec des balises : `{couche}` `{x}` `{y}` `{type}` `{agregation}` `{valeur}` `{xmin}` `{xmax}` `{duree}` `{date}` (AAAAMMJJ) `{aamm}` (ex. 2611). L'extension est ajoutée automatiquement ; les caractères dangereux (`/`, `\`, `..`) sont retirés ; deux noms identiques sont rendus uniques ; un fichier existant n'est écrasé qu'après confirmation.
 - Interface en français ou en anglais selon la langue de QGIS ; réglages mémorisés.
 
 ### Installation
 
-1. Téléchargez `qgis_plugin_graphique.zip` depuis la page [Releases](https://github.com/shenri52/qgis-plugin-graphique/releases).
+1. Téléchargez `qgis_plugin_graphique.zip` depuis la page [Releases](https://github.com/shenri52/qgis_plugin_graphique/releases).
 2. Dans QGIS, ouvrez **Extensions → Installer/Gérer les extensions → Installer depuis un ZIP**.
 3. Sélectionnez l'archive téléchargée.
 
@@ -45,6 +48,7 @@ Publier une version : mettre à jour `version` et `changelog` dans `metadata.txt
 
 ### Historique des versions
 
+- **1.1.0** – Rattachement spatial générique à une couche polygonale, graphique `HORS_ZONE`, export CSV de contrôle, constructeur d'expression, couleurs par série et aperçu du nom de fichier. 
 - **1.0.0** – Première version.
 
 ## English
@@ -56,19 +60,22 @@ Publier une version : mettre à jour `version` et `changelog` dans `metadata.txt
 - Choose the **layer**, one or more **X fields** and the **Y field**. The first ticked X field in the list is the axis; the others form the series. Drag fields to reorder them.
 - **Calculation** on Y: sum, mean, median, min, max, count, or no aggregation. With no Y field, features are counted.
 - **Types**: bar, horizontal bar, stacked bar, line, area, scatter, pie, distribution histogram.
-- **Title**, X and Y **axis labels**, **min/max scales** (empty = automatic), colour, legend, grid, value labels, label rotation, integer ticks.
-- **QGIS expression** filter and “selected features only”.
+- **Title**, X and Y **axis labels**, **min/max scales** (empty = automatic), per-series colours, legend, grid, value labels, label rotation, integer ticks.
+- **QGIS expression** filter with expression builder and “selected features only”.
+- Individually configurable series colours after preview.
+- File name preview below the naming pattern.
 - **Preview** in the dialog before exporting.
 - **Export** to the folder of your choice as **PNG, JPEG, SVG, PDF or TIFF**, with adjustable resolution and size.
 - **Batch mode**: one chart per value of a field, plus an optional global chart and a list of values to skip.
+- **Optional spatial assignment**: assigns source features to any polygon layer using a representative point (with CRS transformation if needed), without changing the source layer. Unmatched features are excluded from the territorial total and can produce a separate `HORS_ZONE` chart and audit CSV. For overlaps, the polygon with the lowest QGIS feature ID is selected.
 - **Customizable file names** with tags: `{couche}` (layer) `{x}` `{y}` `{type}` `{agregation}` `{valeur}` (batch value) `{xmin}` `{xmax}` `{duree}` (X range length) `{date}` (YYYYMMDD) `{aamm}` (e.g. 2611). The extension is added automatically, unsafe characters are removed, duplicate names are made unique, and existing files are only overwritten after confirmation.
 - Interface in French or English following the QGIS language; settings are remembered.
 
-The geoprocessing (spatial join, aggregation) and PDF atlas exports of the original script are not part of the plugin: prepare a layer that already holds the territory field.
+The plugin can now perform the spatial assignment itself; no pre-existing territory field is required. PDF atlas exports remain outside its scope.
 
 ### Installation
 
-1. Download `qgis_plugin_graphique.zip` from the [Releases](https://github.com/shenri52/qgis-plugin-graphique/releases) page.
+1. Download `qgis_plugin_graphique.zip` from the [Releases](https://github.com/shenri52/qgis_plugin_graphique/releases) page.
 2. In QGIS, open **Plugins → Manage and Install Plugins → Install from ZIP**.
 3. Select the downloaded archive.
 
@@ -76,8 +83,14 @@ The plugin relies on **matplotlib**, bundled with QGIS on Windows and macOS. On 
 
 ### Version history
 
+- **1.1.0** – Generic spatial assignment to a polygon layer, `HORS_ZONE` chart and optional CSV audit export. 
 - **1.0.0** – Initial release.
 
 ## License
 
 GPL-2.0. See [LICENSE](LICENSE).
+
+## Project links
+
+- Source code: <https://github.com/shenri52/qgis_plugin_graphique>
+- Issue tracker: <https://github.com/shenri52/qgis_plugin_graphique/issues>
