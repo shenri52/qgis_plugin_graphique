@@ -15,10 +15,13 @@ Elle généralise un script de suivi du drainage (graphiques par EPCI et pour le
 - **Calcul** sur Y : somme, moyenne, médiane, minimum, maximum, comptage, ou aucune agrégation. Sans champ Y : comptage des entités.
 - **Types** : histogramme (barres), barres horizontales, barres empilées, courbe, aire, nuage de points, camembert, histogramme de distribution.
 - **Titre**, **libellés** des axes X et Y, **échelles min/max** (vide = automatique), couleur par série, légende, grille, valeurs affichées, rotation des étiquettes, graduations entières.
-- Filtre par **expression QGIS** et option « entités sélectionnées uniquement ».
+- Filtre par **expression QGIS** avec constructeur d'expression et option « entités sélectionnées uniquement ».
+- **Couleurs individuelles des séries** configurables après l'aperçu.
+- **Aperçu du nom de fichier** sous la formule de nommage.
 - **Aperçu** dans la fenêtre avant export.
 - **Export** dans le dossier de votre choix, en **PNG, JPEG, SVG, PDF ou TIFF**, avec résolution et taille réglables.
-- **Mode lot** : un graphique par valeur d'un champ (ex. un par territoire), plus un graphique global optionnel, avec une liste de valeurs à ignorer.\n- **Rattachement spatial facultatif** : associe chaque entité à une couche polygonale quelconque à partir d'un point représentatif (reprojection des coordonnées si nécessaire), sans créer ni modifier de champ dans la couche source. Les entités sans correspondance sont exclues du total territorial, peuvent produire un graphique `HORS_ZONE` et un CSV de contrôle. En cas de recouvrement, le polygone dont l'identifiant QGIS est le plus petit est retenu.
+- **Mode lot** : un graphique par valeur d'un champ (ex. un par territoire), plus un graphique global optionnel, avec une liste de valeurs à ignorer.
+- **Rattachement spatial facultatif** : associe chaque entité à une couche polygonale quelconque à partir d'un point représentatif (reprojection des coordonnées si nécessaire), sans créer ni modifier de champ dans la couche source. Les entités sans correspondance sont exclues du total territorial, peuvent produire un graphique `HORS_ZONE` et un CSV de contrôle. En cas de recouvrement, le polygone dont l'identifiant QGIS est le plus petit est retenu.
 - **Nom des fichiers personnalisable** avec des balises : `{couche}` `{x}` `{y}` `{type}` `{agregation}` `{valeur}` `{xmin}` `{xmax}` `{duree}` `{date}` (AAAAMMJJ) `{aamm}` (ex. 2611). L'extension est ajoutée automatiquement ; les caractères dangereux (`/`, `\`, `..`) sont retirés ; deux noms identiques sont rendus uniques ; un fichier existant n'est écrasé qu'après confirmation.
 - Interface en français ou en anglais selon la langue de QGIS ; réglages mémorisés.
 
@@ -45,7 +48,7 @@ Publier une version : mettre à jour `version` et `changelog` dans `metadata.txt
 
 ### Historique des versions
 
-- **1.1.0** – Rattachement spatial générique à une couche polygonale, graphique `HORS_ZONE` et export CSV de contrôle optionnel. 
+- **1.1.0** – Rattachement spatial générique à une couche polygonale, graphique `HORS_ZONE`, export CSV de contrôle, constructeur d'expression, couleurs par série et aperçu du nom de fichier. 
 - **1.0.0** – Première version.
 
 ## English
@@ -58,7 +61,9 @@ Publier une version : mettre à jour `version` et `changelog` dans `metadata.txt
 - **Calculation** on Y: sum, mean, median, min, max, count, or no aggregation. With no Y field, features are counted.
 - **Types**: bar, horizontal bar, stacked bar, line, area, scatter, pie, distribution histogram.
 - **Title**, X and Y **axis labels**, **min/max scales** (empty = automatic), per-series colours, legend, grid, value labels, label rotation, integer ticks.
-- **QGIS expression** filter with expression builder and “selected features only”.\n- Individually configurable series colours after preview.\n- File name preview below the naming pattern.
+- **QGIS expression** filter with expression builder and “selected features only”.
+- Individually configurable series colours after preview.
+- File name preview below the naming pattern.
 - **Preview** in the dialog before exporting.
 - **Export** to the folder of your choice as **PNG, JPEG, SVG, PDF or TIFF**, with adjustable resolution and size.
 - **Batch mode**: one chart per value of a field, plus an optional global chart and a list of values to skip.
