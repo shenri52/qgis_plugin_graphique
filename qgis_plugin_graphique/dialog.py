@@ -13,6 +13,7 @@ from qgis.PyQt.QtWidgets import (
     QSplitter, QTabWidget, QVBoxLayout, QWidget, QColorDialog,
 )
 from qgis.core import QgsProject, QgsSettings, QgsVectorLayer
+from qgis.gui import QgsExpressionBuilderDialog
 
 from . import core, data, render
 from .i18n import PRESET_NAMES, tr
@@ -110,7 +111,12 @@ class GraphDialog(QDialog):
         form.addRow(self.selected_only)
         self.filter_edit = QLineEdit()
         self.filter_edit.setPlaceholderText(tr("ex. \"DATE\" >= 2021"))
-        form.addRow(tr("Filtre (expression QGIS, optionnel)"), self.filter_edit)
+        filter_row = QHBoxLayout()
+        filter_row.addWidget(self.filter_edit, 1)
+        self.expression_button = QPushButton(tr("Constructeur…"))
+        self.expression_button.clicked.connect(self._open_expression_builder)
+        filter_row.addWidget(self.expression_button)
+        form.addRow(tr("Filtre (expression QGIS, optionnel)"), filter_row)
         layout.addLayout(form)
 
         x_label = QLabel(tr("Champs X (cochez 1 ou plusieurs ; le premier de la liste est l'axe, "
@@ -249,7 +255,12 @@ class GraphDialog(QDialog):
         self.pattern_combo.setToolTip(tr("Préréglage de nom : équivalent du script Drainage")
                                       + " : " + PRESET_NAMES[0])
         form.addRow(tr("Nom des fichiers"), self.pattern_combo)
+        self.filename_preview = QLabel()
+        self.filename_preview.setWordWrap(True)
+        form.addRow(tr("Aperçu du nom"), self.filename_preview)
+        self.pattern_combo.currentTextChanged.connect(self._update_filename_preview)
         self.format_combo = _combo(FORMAT_LABELS)
+        self.format_combo.currentIndexChanged.connect(self._update_filename_preview)
         form.addRow(tr("Format"), self.format_combo)
         self.dpi_spin = QSpinBox()
         self.dpi_spin.setRange(50, 1200)
@@ -272,6 +283,29 @@ class GraphDialog(QDialog):
         layout.addWidget(help_label)
         layout.addStretch(1)
         return page
+
+    def _update_filename_preview(self, *_args):
+        layer = self._current_layer()
+        spec = core.ChartSpec(
+            chart_type=self.type_combo.currentData() or "bar",
+            xmin=core.parse_optional_float(self.xmin_edit.text()) if self.xmin_edit.text().strip() else None,
+            xmax=core.parse_optional_float(self.xmax_edit.text()) if self.xmax_edit.text().strip() else None)
+        values = {
+            "couche": layer.name() if layer else "couche",
+            "x": "_".join(self._checked_x()) or "X",
+            "y": self.y_combo.currentData() or "NB",
+            "type": spec.chart_type, "agregation": self.agg_combo.currentData() or "sum",
+            "valeur": "HORS_ZONE" if self.spatial_check.isChecked() else "VALEUR",
+            "xmin": core.format_number(spec.xmin), "xmax": core.format_number(spec.xmax),
+            "duree": core.duration(spec.xmin, spec.xmax),
+            "date": datetime.now().strftime("%Y%m%d"), "aamm": datetime.now().strftime("%y%m"),
+        }
+        extension = self.format_combo.currentData() or "png"
+        try:
+            name = core.build_filename(self.pattern_combo.currentText(), values, extension)
+        except core.ChartError:
+            name = ""
+        self.filename_preview.setText(name)
 
     def _build_preview_pane(self):
         pane = QWidget()
@@ -321,6 +355,16 @@ class GraphDialog(QDialog):
 
     def _warn(self, message):
         QMessageBox.warning(self, tr("Attention"), message)
+
+    def _open_expression_builder(self):
+        layer = self._current_layer()
+        if layer is None:
+            self._warn(tr("Choisissez d'abord une couche vectorielle."))
+            return
+        builder = QgsExpressionBuilderDialog(layer, self.filter_edit.text(), self)
+        execute = getattr(builder, "exec", None) or getattr(builder, "exec_", None)
+        if execute and execute():
+            self.filter_edit.setText(builder.expressionText())
 
     # ------------------------------------------------------------------ couches et champs
     def refresh_layers(self):
