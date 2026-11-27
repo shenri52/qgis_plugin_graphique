@@ -14,7 +14,7 @@ Elle généralise un script de suivi du drainage (graphiques par EPCI et pour le
 - Choix de la **couche**, des **champs X** (un ou plusieurs) et du **champ Y**. Le premier champ X coché de la liste est l'axe ; les suivants forment les séries (barres groupées/empilées, plusieurs courbes). Glissez les champs pour changer l'ordre.
 - **Calcul** sur Y : somme, moyenne, médiane, minimum, maximum, comptage, ou aucune agrégation. Sans champ Y : comptage des entités.
 - **Types** : histogramme (barres), barres horizontales, barres empilées, courbe, aire, nuage de points, camembert, histogramme de distribution.
-- **Titre**, **libellés** des axes X et Y, **échelles min/max** (vide = automatique), couleur par série, légende, grille, valeurs affichées, rotation des étiquettes, graduations entières.
+- **Titre**, **libellés** des axes X et Y, **échelles min/max** (vide = automatique), détection des bornes X à partir des données après filtre, couleur par série, légende, grille, valeurs affichées, rotation des étiquettes, graduations entières.
 - Filtre par **expression QGIS** avec constructeur d'expression et option « entités sélectionnées uniquement ».
 - **Couleurs individuelles des séries** configurables après l'aperçu.
 - **Aperçu du nom de fichier** sous la formule de nommage.
@@ -22,7 +22,7 @@ Elle généralise un script de suivi du drainage (graphiques par EPCI et pour le
 - **Export** dans le dossier de votre choix, en **PNG, JPEG, SVG, PDF ou TIFF**, avec résolution et taille réglables.
 - **Mode lot** : un graphique par valeur d'un champ (ex. un par territoire), plus un graphique global optionnel, avec une liste de valeurs à ignorer.
 - **Rattachement spatial facultatif** : associe chaque entité à une couche polygonale quelconque à partir d'un point représentatif (reprojection des coordonnées si nécessaire), sans créer ni modifier de champ dans la couche source. Les entités sans correspondance sont exclues du total territorial, peuvent produire un graphique `HORS_ZONE` et un CSV de contrôle. En cas de recouvrement, le polygone dont l'identifiant QGIS est le plus petit est retenu.
-- **Nom des fichiers personnalisable** avec des balises : `{couche}` `{x}` `{y}` `{type}` `{agregation}` `{valeur}` `{xmin}` `{xmax}` `{duree}` `{date}` (AAAAMMJJ) `{aamm}` (ex. 2611). L'extension est ajoutée automatiquement ; les caractères dangereux (`/`, `\`, `..`) sont retirés ; deux noms identiques sont rendus uniques ; un fichier existant n'est écrasé qu'après confirmation.
+- **Nom des fichiers personnalisable** avec des balises. La balise `{duree}` est calculée à partir des bornes X ; le bouton « Détecter les bornes X » renseigne ces bornes depuis les valeurs numériques retenues après filtre et sélection (le filtre ne définit donc pas lui-même la durée). Balises disponibles : `{couche}` `{x}` `{y}` `{type}` `{agregation}` `{valeur}` `{xmin}` `{xmax}` `{duree}` `{date}` (AAAAMMJJ) `{aamm}` (ex. 2611). L'extension est ajoutée automatiquement ; les caractères dangereux (`/`, `\`, `..`) sont retirés ; deux noms identiques sont rendus uniques ; un fichier existant n'est écrasé qu'après confirmation.
 - Interface en français ou en anglais selon la langue de QGIS ; réglages mémorisés.
 
 ### Installation
@@ -48,6 +48,7 @@ Publier une version : mettre à jour `version` et `changelog` dans `metadata.txt
 
 ### Historique des versions
 
+- **1.1.1** – Détection des bornes X après filtre et sélection pour faciliter le calcul de `{duree}`.
 - **1.1.0** – Rattachement spatial générique à une couche polygonale, graphique `HORS_ZONE`, export CSV de contrôle, constructeur d'expression, couleurs par série et aperçu du nom de fichier. 
 - **1.0.0** – Première version.
 
